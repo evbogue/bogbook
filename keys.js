@@ -1,6 +1,6 @@
 import nacl from './lib/nacl-fast-es.js'
 import { path } from './path.js'
-import { decode, encode } from 'https://deno.land/std@0.129.0/encoding/base64.ts'
+import { decode, encode } from './lib/base64.js'
 import { ensureFileSync } from 'https://deno.land/std@0.129.0/fs/mod.ts'
 
 export const keys = function () {

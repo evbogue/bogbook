@@ -1,12 +1,21 @@
 import { keys } from './browserkeys.js'
+import { navbar } from './navbar.js'
+import { route } from './route.js'
+import { welcome } from './welcome.js'
+
+if (!window.location.hash) { window.location = '#' }
 
 function start () {
-  if (keys) {
-    document.body.appendChild(h('div', [keys.pubkey()]))
+  if (keys === 'welcome') {
+    document.body.appendChild(welcome) 
+  } else if (keys) {
+    //welcome.parentNode.removeChild(welcome)
+    route()
+    navbar() 
   } else {
-    setTimeout(function () {
-      start()
-    }, 150)
+    console.log(keys)
+    //document.body.appendChild(welcome)
+    setTimeout(function () { start() }, 1500)
   }
 }
 
