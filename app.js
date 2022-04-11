@@ -13,7 +13,6 @@ function start () {
     route()
     navbar() 
   } else {
-    console.log(keys)
     //document.body.appendChild(welcome)
     setTimeout(function () { start() }, 1500)
   }

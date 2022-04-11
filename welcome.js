@@ -1,3 +1,4 @@
+import { h } from './lib/misc.js'
 import { encode } from './lib/base64.js'
 import { getImage, getName } from './avatar.js'
 
