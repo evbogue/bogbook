@@ -4,17 +4,24 @@ import { markdown } from './markdown.js'
 const kv = new IdbKvStore('ssboat')
 
 export function composer (src) {
+  if (!src) { src = 'home' }
   let preview = h('div')
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
   textarea.addEventListener('input', function (e) {
-    /*if (textarea.value) {
+    if (textarea.value) {
       kv.set(src, textarea.value)
     } else {
       kv.remove(src)
-    }*/
+    }
     preview.innerHTML = markdown(textarea.value)
+  })
+
+  kv.get(src).then(got => {
+    if (got) {
+      textarea.value = got
+    }
   })
 
   const publish = h('button', {
