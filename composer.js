@@ -1,5 +1,7 @@
 import { h } from './lib/misc.js'
 import { markdown } from './markdown.js'
+import { publish } from './sbog.js'
+import { make, find } from './inpfs.js'
 
 const kv = new IdbKvStore('ssboat')
 
@@ -26,7 +28,11 @@ export function composer (src) {
 
   const publish = h('button', {
     onclick: function () {
-      alert('PUBLISHED!')
+      if (textarea.value) {
+        make({file: textarea.value, type: 'md'}).then(inpns => {
+          console.log(inpns)
+        })
+      }
     }
   }, ['Publish'])
 
@@ -35,5 +41,6 @@ export function composer (src) {
     textarea,
     publish
   ])
+
   return composer
 }
