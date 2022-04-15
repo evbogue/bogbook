@@ -1,7 +1,10 @@
 import { h } from './lib/misc.js'
 import { markdown } from './markdown.js'
-import { publish } from './sbog.js'
+import { publish, open } from './sbog.js'
 import { make, find } from './inpfs.js'
+import { save } from './browserlog.js'
+import { render } from './render.js'
+
 
 const kv = new IdbKvStore('ssboat')
 
@@ -26,11 +29,21 @@ export function composer (src) {
     }
   })
 
-  const publish = h('button', {
+  const publishButton = h('button', {
     onclick: function () {
       if (textarea.value) {
-        make({file: textarea.value, type: 'md'}).then(inpns => {
-          console.log(inpns)
+        make({file: textarea.value, type: 'md'}).then(content => {
+          publish(content).then(msg => {
+            open(msg).then(opened => {
+              render(opened).then(rendered => {
+                scroller.insertBefore(rendered, scroller.childNodes[1])
+                preview.innerHTML = ''
+                textarea.value = ''
+                kv.remove(src)
+                save()
+              }) 
+            })
+          })
         })
       }
     }
@@ -39,7 +52,7 @@ export function composer (src) {
   const composer = h('div', [
     preview,
     textarea,
-    publish
+    publishButton
   ])
 
   return composer

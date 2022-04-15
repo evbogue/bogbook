@@ -2,7 +2,6 @@ body {
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
-  transition: all .5s ease-in-out;
   font-family: sans-serif;
   background: #f5f5f5;
 }
@@ -58,7 +57,16 @@ pre, code {
   background: #fff;
   border: 1px solid #ccc;
   margin-top: 3px;
-  border-radius: 3px;
+  border-radius: 5px;
+}
+
+.message, .message > * {
+  animation: fadein .5s;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 a {
@@ -80,3 +88,5 @@ textarea {
 img {
   border-radius: 5px;
 }
+
+.right { float: right;}
