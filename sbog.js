@@ -3,9 +3,9 @@ import { keys } from './browserkeys.js'
 import { decode, encode } from './lib/base64.js'
 import { logs } from './browserlog.js'
 
-export async function publish (inpns) {
+export async function publish (text) {
   const obj = {
-    content: inpns,
+    text,
     author: keys.pubkey(),
     timestamp: Date.now()
   }

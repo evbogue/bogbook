@@ -32,17 +32,15 @@ export function composer (src) {
   const publishButton = h('button', {
     onclick: function () {
       if (textarea.value) {
-        make({file: textarea.value, type: 'md'}).then(content => {
-          publish(content).then(msg => {
-            open(msg).then(opened => {
-              render(opened).then(rendered => {
-                scroller.insertBefore(rendered, scroller.childNodes[1])
-                preview.innerHTML = ''
-                textarea.value = ''
-                kv.remove(src)
-                save()
-              }) 
-            })
+        publish(textarea.value).then(msg => {
+          open(msg).then(opened => {
+            render(opened).then(rendered => {
+              scroller.insertBefore(rendered, scroller.childNodes[1])
+              preview.innerHTML = ''
+              textarea.value = ''
+              kv.remove(src)
+              save()
+            }) 
           })
         })
       }

@@ -6,7 +6,11 @@ var log = []
 var feeds = []
 
 kv.get('log', function (err, file) {
-  if (file) { log = file}
+  if (file) { 
+    log = file
+    log.sort((a,b) => a.timestamp - b.timestamp)
+    kv.set('log', log)
+  }
 })
 
 kv.get('feeds', function ( err, file) {

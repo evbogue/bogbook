@@ -16,10 +16,8 @@ export async function render (msg) {
   ]))
 
   message.appendChild(getBoth(msg.author))
-  if (msg.content) {
-    const data = await find(msg.content) 
-    console.log(data)
-    const content = h('div', {innerHTML: markdown(data)})
+  if (msg.text) {
+    const content = h('div', {innerHTML: markdown(msg.text)})
     message.appendChild(content)
   }
   return message
