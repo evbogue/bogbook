@@ -4,6 +4,7 @@ body {
   word-break: break-word;
   font-family: sans-serif;
   background: #f5f5f5;
+  font-size: .8em;
 }
 
 p { font-size: 1em;}
@@ -83,6 +84,14 @@ a {
 
 textarea {
   width: 100%;
+}
+
+textarea, input {
+  font-family: sans-serif;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
 }
 
 img {
