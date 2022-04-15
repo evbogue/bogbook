@@ -1,6 +1,6 @@
 import { h } from './lib/misc.js'
 import { home } from './routes/home.js'
-import { pubhash } from './routes/pubhash.js'
+import { query } from './routes/query.js'
 
 export function route () {
   const screen = h('div', {id: 'screen'})
@@ -13,8 +13,8 @@ export function route () {
 
   if (src === '') {
     home(scroller)
-  } if (src.length == 44) {
-    pubhash(scroller, src)
+  } else {
+    query(scroller, src)
   }
 
   window.onhashchange = function () {

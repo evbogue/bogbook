@@ -40,9 +40,30 @@ export const logs = function logs (query) {
     getFeed: function (query) {
       if (feeds[query]) {
         return feeds[query]
-      } else {
-        return undefined
       }
+    },
+    query: async function (query) {
+      if (query) {
+        let querylog = []
+        if (log.length) {
+          for (let i = log.length -1; i >= 0; i--) {
+            
+            if ((log[i].raw.substring(0, 44) === query) || (log[i].raw.substring(44,88) == query)) {
+              console.log(log[i])
+              querylog.unshift(log[i])
+            }
+            if (query.startsWith('?')) {
+              const search = query.substring(1).replace(/%20/g, ' ').toUpperCase()
+              if (log[i].text.toUpperCase().includes(search)) {
+                querylog.unshift(log[i])
+              }
+            }
+            if (i === 0) {
+              return querylog
+            }
+          }
+        }
+      } 
     },
     addMsg: function (msg) {
       open(msg).then(opened => {
