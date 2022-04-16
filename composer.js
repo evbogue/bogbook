@@ -66,5 +66,12 @@ export function composer (src) {
     publishButton
   ])
 
+  if (src != 'home') {
+    const cancelButton = h('button', {onclick: function () {
+      composer.parentNode.parentNode.removeChild(composer.parentNode)
+    }}, ['Cancel'])
+    composer.appendChild(cancelButton)
+  }
+
   return composer
 }
