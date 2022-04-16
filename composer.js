@@ -4,15 +4,22 @@ import { publish, open } from './sbog.js'
 import { make, find } from './inpfs.js'
 import { save } from './browserlog.js'
 import { render } from './render.js'
-
+import { getName } from './avatar.js'
 
 const kv = new IdbKvStore('ssboat')
 
 export function composer (src) {
-  if (!src) { src = 'home' }
   let preview = h('div')
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
+
+  if (!src) { 
+    src = 'home' 
+  } else if (src.length === 44) {
+    var select = window.getSelection().toString()
+    console.log(select)
+    textarea.value = '↳ [' + (select || src.substring(0, 7)) + '](' + src + ')'  
+  }
 
   textarea.addEventListener('input', function (e) {
     if (textarea.value) {
@@ -35,7 +42,13 @@ export function composer (src) {
         publish(textarea.value).then(msg => {
           open(msg).then(opened => {
             render(opened).then(rendered => {
-              scroller.insertBefore(rendered, scroller.childNodes[1])
+              const getMsg = document.getElementById(src)
+              if (getMsg) {
+                composer.parentNode.parentNode.removeChild(composer.parentNode)
+                getMsg.appendChild(h('div', {classList: 'indent'}, [rendered]))
+              } else {
+                scroller.insertBefore(rendered, scroller.childNodes[1])
+              }
               preview.innerHTML = ''
               textarea.value = ''
               kv.remove(src)

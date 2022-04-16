@@ -1,43 +1,22 @@
 import { h } from './../lib/misc.js'
 import { getBoth } from './../avatar.js'
 import { logs } from './../browserlog.js'
-import { render } from './../render.js'
-
-async function addPosts (posts, scroller) {
-  posts.forEach(msg => {
-    render(msg).then(rendered => {
-      console.log(rendered)
-      scroller.appendChild(rendered)
-    })
-  })
-}
+import { keys } from './../browserkeys.js'
+import { adder } from './../adder.js'
 
 export function query (scroller, src) {
+  const header = h('div', {classList: 'message'})
   if (src.length === 44) {
-    scroller.appendChild(h('div', {classList: 'message'}, [getBoth(src)]))
+    if (src === keys.pubkey()) {
+      header.appendChild(h('span', {classList: 'right'}, ['This is you.']))
+    }
+    header.appendChild(h('span', [getBoth(src)]))
   } else if (src.startsWith('?')) {
-    scroller.appendChild(h('div', {classList: 'message'}, ['Search: ' + src.substring(1)]))
+    header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
+  scroller.appendChild(header)
+
   logs.query(src).then(log => {
-    let index = 0
-
-    var reverse = log.slice().reverse()
-    var posts = reverse.slice(index, index + 25)
-    addPosts(posts, scroller).then(done => {
-      index = index + 25
-      window.onscroll = function (ev) {
-        if (((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 1000) && src === '') {
-          posts = reverse.slice(index, index + 25)
-          index = index + 25
-          addPosts(posts, scroller)
-        }
-      }
-    })
-
-    //querylog.forEach(msg => {
-    //  render(msg).then(rendered => {
-    //    scroller.insertBefore(rendered, scroller.childNodes[1])
-    //  }) 
-    //})
+    adder(log, src, scroller)
   })  
 } 

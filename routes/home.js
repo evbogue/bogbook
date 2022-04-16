@@ -3,21 +3,20 @@ import { keys } from './../browserkeys.js'
 import { getBoth } from './../avatar.js'
 import { h } from './../lib/misc.js'
 import { logs } from './../browserlog.js'
-import { render } from './../render.js' 
+import { adder } from './../adder.js'
 
-async function addPosts (posts, scroller) {
-  console.log(posts)
-  console.log('add message')
-  posts.forEach(msg => {
-    render(msg).then(rendered => {
-      console.log(rendered)
-      scroller.appendChild(rendered)
-    })
-  })
-}
+//async function addPosts (posts, scroller) {
+//  console.log(posts)
+//  console.log('add message')
+//  posts.forEach(msg => {
+//    render(msg).then(rendered => {
+//      console.log(rendered)
+//      scroller.appendChild(rendered)
+//    })
+//  })
+//}
 
 export function home (scroller) {
-  const src = window.location.hash.substring(1)
 
   const composemsg = h('div', {classList: 'message'}, [
     h('span', {classList: 'right'}, ['Preview']),
@@ -28,19 +27,20 @@ export function home (scroller) {
   scroller.appendChild(composemsg)
 
   logs.getLog().then(log => {
-    let index = 0
+    adder(log, '', scroller)
+    //let index = 0
 
-    var reverse = log.slice().reverse()
-    var posts = reverse.slice(index, index + 25)
-    addPosts(posts, scroller).then(done => {
-      index = index + 25
-      window.onscroll = function (ev) {
-        if (((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 1000) && src === '') {
-          posts = reverse.slice(index, index + 25)
-          index = index + 25
-          addPosts(posts, scroller)
-        }
-      }
-    })
+    //var reverse = log.slice().reverse()
+    //var posts = reverse.slice(index, index + 25)
+    //addPosts(posts, scroller).then(done => {
+    //  index = index + 25
+    //  window.onscroll = function (ev) {
+    //    if (((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 1000) && src === '') {
+    //      posts = reverse.slice(index, index + 25)
+    //      index = index + 25
+    //      addPosts(posts, scroller)
+    //    }
+    //  }
+    //})
   })
 }

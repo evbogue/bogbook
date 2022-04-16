@@ -61,6 +61,10 @@ pre, code {
   border-radius: 5px;
 }
 
+.indent {
+  margin-left: 2em;
+}
+
 .message, .message > * {
   animation: fadein .5s;
 }

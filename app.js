@@ -9,11 +9,9 @@ function start () {
   if (keys === 'welcome') {
     document.body.appendChild(welcome) 
   } else if (keys) {
-    //welcome.parentNode.removeChild(welcome)
     route()
     navbar() 
   } else {
-    //document.body.appendChild(welcome)
     setTimeout(function () { start() }, 1500)
   }
 }
