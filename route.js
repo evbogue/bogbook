@@ -1,6 +1,7 @@
 import { h } from './lib/misc.js'
 import { home } from './routes/home.js'
 import { query } from './routes/query.js'
+import { keyroute } from './routes/key.js'
 
 export function route () {
   const screen = h('div', {id: 'screen'})
@@ -13,6 +14,8 @@ export function route () {
 
   if (src === '') {
     home(scroller)
+  } else if (src === 'key') {
+    keyroute(scroller)
   } else {
     query(scroller, src)
   }

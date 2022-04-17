@@ -8,7 +8,9 @@ export function navbar (screen) {
   const internal = h('div', {classList: 'internal'}, [
     getBoth(keys.pubkey()),
     ' ',
-    h('a', {href: '#'}, ['Home'])
+    h('a', {href: '#'}, ['Home']),
+    ' ',
+    h('a', {href: '#key'}, ['Key'])
   ])
   navbar.appendChild(internal)
 }

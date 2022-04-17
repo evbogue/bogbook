@@ -17,7 +17,6 @@ export function composer (src) {
     src = 'home' 
   } else if (src.length === 44) {
     var select = window.getSelection().toString()
-    console.log(select)
     textarea.value = '↳ [' + (select || src.substring(0, 7)) + '](' + src + ')'  
   }
 
