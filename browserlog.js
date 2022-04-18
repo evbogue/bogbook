@@ -15,7 +15,6 @@ kv.get('log', function (err, file) {
 
 kv.get('feeds', function ( err, file) {
   if (file) { feeds = file }
-  console.log(feeds)
 })
 
 let newData = false
@@ -37,6 +36,9 @@ export const logs = function logs (query) {
     getLog: async function () {
       return log
     },
+    getFeeds: function () {
+      return feeds
+    },
     getFeed: function (query) {
       if (feeds[query]) {
         return feeds[query]
@@ -49,12 +51,11 @@ export const logs = function logs (query) {
           for (let i = log.length -1; i >= 0; i--) {
             
             if ((log[i].raw.substring(0, 44) === query) || (log[i].raw.substring(44,88) == query)) {
-              console.log(log[i])
               querylog.unshift(log[i])
             }
             if (query.startsWith('?')) {
               const search = query.substring(1).replace(/%20/g, ' ').toUpperCase()
-              if (log[i].text.toUpperCase().includes(search)) {
+              if (log[i].text && log[i].text.toUpperCase().includes(search)) {
                 querylog.unshift(log[i])
               }
             }
@@ -82,5 +83,3 @@ export const logs = function logs (query) {
     }
   }
 }()
-
-

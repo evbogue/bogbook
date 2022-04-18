@@ -2,22 +2,67 @@ import { h } from './lib/misc.js'
 import { markdown } from './markdown.js'
 import { publish, open } from './sbog.js'
 import { make, find } from './inpfs.js'
-import { save } from './browserlog.js'
+import { save, logs } from './browserlog.js'
 import { render } from './render.js'
-import { getName } from './avatar.js'
+import { getName, getImage } from './avatar.js'
 
 const kv = new IdbKvStore('ssboat')
 
-export function composer (src) {
+function getContacts (textarea, preview) {
+  const feeds = logs.getFeeds()
+  var span = h('span')
+
+  var button = h('button', {onclick: function () {
+    if (!span.childNodes[1]) {
+      var addrs = h('span')
+      span.appendChild(addrs)
+      Object.keys(feeds).forEach(function (key, index) {
+        addrs.appendChild(h('button', {onclick: function () {
+          kv.get('name:' + key).then(name => {
+            if (textarea.selectionStart || textarea.selectionEnd) {
+              textarea.value = textarea.value.substring(0, textarea.selectionStart)
+                + ' [' + name + '](' + key + ') ' +
+                textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+            } else {
+              textarea.value = textarea.value + ' [' + name + '](' + key + ')'
+            }
+            preview.innerHTML = marked(textarea.value)
+          })
+        }}, [getImage(key), getName(key)]))
+      })
+    } else {
+      span.removeChild(span.childNodes[1])
+    }
+  }}, ['📇 '])
+
+  span.appendChild(button)
+
+  return span
+}
+
+
+export function composer (msg) {
   let preview = h('div')
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
-  if (!src) { 
-    src = 'home' 
-  } else if (src.length === 44) {
-    var select = window.getSelection().toString()
-    textarea.value = '↳ [' + (select || src.substring(0, 7)) + '](' + src + ')'  
+  let src
+
+  if (msg) {
+    src = msg.raw.substring(0, 44)
+  } else {
+    src = 'home'
+  }
+
+  if (src.length === 44) {
+    kv.get('name:' + msg.author).then(name => {
+      var select = window.getSelection().toString()
+      if (msg.author === src) {
+        textarea.value = '[' + name + '](' + msg.author + ')'
+      } else {
+        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || src.substring(0, 7)) + '](' + src + ')'
+      }
+    })
   }
 
   textarea.addEventListener('input', function (e) {
@@ -38,7 +83,7 @@ export function composer (src) {
   const publishButton = h('button', {
     onclick: function () {
       if (textarea.value) {
-        publish(textarea.value).then(msg => {
+        publish({text: textarea.value}).then(msg => {
           open(msg).then(opened => {
             render(opened).then(rendered => {
               const getMsg = document.getElementById(src)
@@ -62,7 +107,8 @@ export function composer (src) {
   const composer = h('div', [
     preview,
     textarea,
-    publishButton
+    publishButton,
+    getContacts(textarea, preview)
   ])
 
   if (src != 'home') {

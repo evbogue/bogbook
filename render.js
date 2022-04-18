@@ -23,18 +23,13 @@ export async function render (msg) {
 
   message.appendChild(getBoth(msg.author))
 
-  if (msg.text) {
-    const content = h('div', {innerHTML: markdown(msg.text)})
-    message.appendChild(content)
-  }
-
   const reply = h('button', {onclick: function () {
     const getReply = document.getElementById('reply:' + src)
     if (!getReply) {
       const replybox = h('div', {id: 'reply:' + src, classList: 'message'}, [
         h('span', {classList: 'right'}, ['Preview']),
         getBoth(keys.pubkey()),
-        composer(msg.raw.substring(0, 44))
+        composer(msg)
       ])
       if (replyDiv.firstChild) {
         replyDiv.insertBefore(replyBox, replyDiv.firstChild)
@@ -44,7 +39,19 @@ export async function render (msg) {
     }
   }}, ['Reply'])
 
-  message.appendChild(reply)
+  if (msg.text) {
+    const content = h('div', {innerHTML: markdown(msg.text)})
+    message.appendChild(content)
+    message.appendChild(reply)
+  }
+
+  if (msg.name) {
+    const content = h('span', [
+      ' named ', 
+      h('a', {href: '#' + msg.named}, [msg.name])
+    ])
+    message.appendChild(content)
+  }
 
   const replyDiv = h('div', {classList: 'indent'})
 
