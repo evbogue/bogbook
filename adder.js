@@ -5,7 +5,6 @@ async function addPosts (posts, div) {
     const getMsg = document.getElementById(msg.raw.substring(0, 44))
     if (!getMsg) {
       render(msg).then(rendered => {
-        console.log(rendered)
         div.appendChild(rendered)
       })
     }
