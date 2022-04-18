@@ -3,12 +3,10 @@ import { keys } from './browserkeys.js'
 import { decode, encode } from './lib/base64.js'
 import { logs } from './browserlog.js'
 
-export async function publish (text) {
-  const obj = {
-    text,
-    author: keys.pubkey(),
-    timestamp: Date.now()
-  }
+export async function publish (obj) {
+  obj.author = keys.pubkey()
+  obj.timestamp = Date.now()
+
   const tosign = new TextEncoder().encode(JSON.stringify(obj))
   const sig = nacl.sign(tosign, decode(keys.privkey()))
   const hash = new Uint8Array(await crypto.subtle.digest(
