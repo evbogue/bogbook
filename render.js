@@ -13,12 +13,16 @@ export async function render (msg) {
   const message = h('div', {classList: 'message'})
   messageDiv.appendChild(message)
 
+  const timestamp = h('a', {href: '#' + src}, [human(new Date(msg.timestamp))])
+
+  setInterval(function () {
+    timestamp.textContent = human(new Date(msg.timestamp))
+  }, 10000)
+
   message.appendChild(h('span', {classList: 'right'}, [
     h('code', [msg.author.substring(0, 7)]),
     ' ',
-    h('a', {href: '#' + src}, [
-      human(new Date(msg.timestamp))
-    ])
+    timestamp
   ]))
 
   message.appendChild(getBoth(msg.author))
@@ -41,6 +45,9 @@ export async function render (msg) {
 
   if (msg.text) {
     const content = h('div', {innerHTML: markdown(msg.text)})
+    setTimeout(function () {
+      content.innerHTML = markdown(msg.text)
+    }, 1000)
     message.appendChild(content)
     message.appendChild(reply)
   }

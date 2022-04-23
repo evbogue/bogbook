@@ -40,6 +40,45 @@ function getContacts (textarea, preview) {
   return span
 }
 
+function photoAdder (textarea, preview) {
+
+  const uploadButton = h('button', {onclick: function () {
+    input.click()
+  }}, ['📸 '])
+
+  const buttonsDiv = h('span', [
+    uploadButton
+  ])
+
+  const input = h('input', { type: 'file', style: 'display: none;', onchange: function (e) {
+    for (let i = 0; i < e.srcElement.files.length; i++) {
+      const file = e.srcElement.files[i]
+      const img = h('img', {classList: 'thumb'})
+      const reader = new FileReader()
+
+      reader.onloadend = function () {
+        img.src = reader.result
+        make(img.src).then(hash => {
+          if (textarea.selectionStart || textarea.selectionEnd) {
+            textarea.value = textarea.value.substring(0, textarea.selectionStart)
+              + ' ![](' + hash + ') ' +
+              textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+          } else {
+            textarea.value = textarea.value + ' ![](' + hash + ')'
+          }
+          setTimeout(function () {
+            preview.innerHTML = markdown(textarea.value)
+          }, 1000)
+        })   
+      }
+      reader.readAsDataURL(file)
+    }
+  }})
+
+  buttonsDiv.appendChild(input)
+
+  return buttonsDiv
+}
 
 export function composer (msg) {
   let preview = h('div')
@@ -77,6 +116,10 @@ export function composer (msg) {
   kv.get(src).then(got => {
     if (got) {
       textarea.value = got
+      preview.innerHTML = markdown(textarea.value)
+      setTimeout(function () {
+        preview.innerHTML = markdown(textarea.value)
+      }, 1000)
     }
   })
 
@@ -88,7 +131,7 @@ export function composer (msg) {
             render(opened).then(rendered => {
               const getMsg = document.getElementById(src)
               if (getMsg) {
-                composer.parentNode.parentNode.removeChild(composer.parentNode)
+                compose.parentNode.parentNode.removeChild(compose.parentNode)
                 getMsg.appendChild(h('div', {classList: 'indent'}, [rendered]))
               } else {
                 scroller.insertBefore(rendered, scroller.childNodes[1])
@@ -104,19 +147,20 @@ export function composer (msg) {
     }
   }, ['Publish'])
 
-  const composer = h('div', [
+  const compose = h('div', [
     preview,
     textarea,
     publishButton,
+    photoAdder(textarea, preview),
     getContacts(textarea, preview)
   ])
 
   if (src != 'home') {
     const cancelButton = h('button', {onclick: function () {
-      composer.parentNode.parentNode.removeChild(composer.parentNode)
+      compose.parentNode.parentNode.removeChild(compose.parentNode)
     }}, ['Cancel'])
-    composer.appendChild(cancelButton)
+    compose.appendChild(cancelButton)
   }
 
-  return composer
+  return compose
 }
