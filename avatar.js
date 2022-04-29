@@ -4,12 +4,33 @@ import { keys } from './browserkeys.js'
 import { publish, open } from './sbog.js'
 import { render } from './render.js'
 import { logs } from './browserlog.js'
+import { cache } from './cache.js'
+
 
 const kv = new IdbKvStore('ssboat')
 
 export function getImage (id) {
   let img = vb(decode(id), 256)
-  img.classList = 'avatar'  
+  img.classList = 'avatar'
+
+  logs.getLog().then(log => {
+    for (let i = 0; i < log.length; i++) {
+      if (log[i].imaged === id) {
+        const file = cache.get(log[i].image)
+        if (file) {
+          img.src = file
+        } else {
+          setTimeout(function () {
+            const retry = cache.get(log[i].image)
+            if (retry) {
+              img.src = retry
+            }
+          }, 1000)
+        }
+      }
+    }
+  })
+
   return img
 }
 

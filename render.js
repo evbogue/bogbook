@@ -1,6 +1,6 @@
-import { getBoth } from './avatar.js'
+import { getBoth, getName } from './avatar.js'
 import { h, human } from './lib/misc.js'
-import { find } from './inpfs.js'
+import { cache } from './cache.js'
 import { markdown } from './markdown.js'
 import { composer } from './composer.js' 
 import { keys } from './browserkeys.js'
@@ -58,6 +58,28 @@ export async function render (msg) {
       h('a', {href: '#' + msg.named}, [msg.name])
     ])
     message.appendChild(content)
+  }
+
+  if (msg.image) {
+    const img = h('img', {classList: 'thumb'})
+    const link = h('a', { href: '#' + msg.imaged}, [getName(msg.imaged)])
+    const content = h('span', [
+      ' posted an image of ',
+      link, 
+      ' '
+    ])
+    const image = cache.get(msg.image)
+    if (image) {
+      content.appendChild(h('img', {classList: 'avatar', src: image}))
+    } else {
+      setTimeout(function () {
+        const retry = cache.get(msg.image)
+        if (retry) {
+          content.appendChild(h('img', {classList: 'avatar', src: retry}))
+        }
+      }, 1000)
+    }
+    message.appendChild(content) 
   }
 
   const replyDiv = h('div', {classList: 'indent'})

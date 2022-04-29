@@ -46,9 +46,6 @@ function photoAdder (textarea, preview) {
     input.click()
   }}, ['📸 '])
 
-  const buttonsDiv = h('span', [
-    uploadButton
-  ])
 
   const input = h('input', { type: 'file', style: 'display: none;', onchange: function (e) {
     for (let i = 0; i < e.srcElement.files.length; i++) {
@@ -75,7 +72,10 @@ function photoAdder (textarea, preview) {
     }
   }})
 
-  buttonsDiv.appendChild(input)
+  const buttonsDiv = h('span', [
+    uploadButton,
+    input
+  ])
 
   return buttonsDiv
 }
