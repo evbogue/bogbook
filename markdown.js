@@ -60,7 +60,7 @@ renderer.image = function (src, unknown, title) {
   if (src.length === 44) {
     const image = cache.get(src)
     if (image) {
-      return '<div class="thumb"><img src="' + image + '" title="' + title + '" /></div>'
+      return '<div><img src="' + image + '" title="' + title + '" class="thumb" /></div>'
     } else { return ''}
   }
 }
