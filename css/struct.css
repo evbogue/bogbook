@@ -81,7 +81,7 @@ a {
 
 .avatar {
   width: 22px;
-  width: 22px;
+  height: 22px;
   vertical-align: middle;
   object-fit: cover;
 }
