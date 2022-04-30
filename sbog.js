@@ -9,11 +9,8 @@ export async function publish (obj) {
 
   const tosign = new TextEncoder().encode(JSON.stringify(obj))
   const sig = nacl.sign(tosign, decode(keys.privkey()))
-  const hash = new Uint8Array(await crypto.subtle.digest(
-    "SHA-256",
-    sig
-    //new TextEncoder().encode(sig)
-  ))
+  const hash = sha256.hash(sig) 
+
   let authorfeed = logs.getFeed(obj.author)
   let previous
   if (!authorfeed) {
@@ -27,16 +24,12 @@ export async function publish (obj) {
 export async function open (msg) {
   const author = msg.substring(44, 88)
   const sig = msg.substring(132)
-  const hash = new Uint8Array(await crypto.subtle.digest(
-    "SHA-256",
-    decode(sig)
-  ))
+  const hash = sha256(decode(sig))
    
   if (encode(hash) === msg.substring(0, 44)) {
     const opened = nacl.sign.open(decode(sig), decode(author))
     const message = JSON.parse(new TextDecoder().decode(opened))
     message.raw = msg
-    console.log(message)
     return message
   }
 }
