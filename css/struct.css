@@ -103,8 +103,10 @@ img {
   max-width: 100%;
 }
 
-.thumb {width: 75px;}
-
-.thumb:focus {width: 100%;}
+.thumb {
+  width: 75px; 
+  height: 75px; 
+  object-fit: cover;
+}
 
 .right { float: right;}

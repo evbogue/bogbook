@@ -4,9 +4,10 @@ import { logs } from './../browserlog.js'
 import { keys } from './../browserkeys.js'
 import { adder } from './../adder.js'
 import { make } from './../inpfs.js'
-import { publish } from './../sbog.js'
+import { publish, open } from './../sbog.js'
+import { render } from './../render.js'
 
-function photoAdder (src) {
+function photoAdder (src, div) {
   const uploadButton = h('button', {onclick: function () {
     input.click()
   }}, ['📸  '])
@@ -19,18 +20,25 @@ function photoAdder (src) {
     const file = e.srcElement.files[0]
     const img = h('img', {classList: 'thumb'})
     const reader = new FileReader()
-
     reader.onloadend = function () {
       img.src = reader.result
       console.log(img.src)
       make(img.src).then(hash => {
-        console.log(hash)
-        buttonsDiv.appendChild(h('div', [
+        const imgDiv = h('div', [
           img,
           h('button', { onclick: function () {
-            publish({image: hash, imaged: src})
+            publish({image: hash, imaged: src}).then(msg => {
+              open(msg).then(opened => {
+                render(opened).then(rendered => {
+                  div.appendChild(rendered)
+                  imgDiv.parentNode.removeChild(imgDiv)
+                })
+              })
+            })
           }}, ['Publish'])
-        ]))
+        ])
+        console.log(hash)
+        buttonsDiv.appendChild(imgDiv)
       })
     }
     
@@ -58,7 +66,7 @@ export function query (scroller, src) {
     }
     header.appendChild(h('span', [getBoth(src)]))
     header.appendChild(nameDiv)
-    header.appendChild(photoAdder(src))
+    header.appendChild(photoAdder(src, messageDiv))
   } else if (src.startsWith('?')) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
