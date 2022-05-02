@@ -48,7 +48,8 @@ pre, code {
 }
 
 #scroller {
-  max-width: 680px;
+  width: 680px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
