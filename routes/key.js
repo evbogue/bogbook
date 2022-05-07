@@ -4,12 +4,17 @@ import { keys } from './../browserkeys.js'
 const kv = new IdbKvStore('ssboat')
 
 export function keyroute (scroller) {
-  const textarea = h('textarea', [keys.keypair()])
+  const textarea = h('textarea')
+  if (keys === 'welcome') {
+    textarea.placeholder = 'Import an existing keypair...'
+  } else {
+    textarea.value = keys.keypair()
+  }
   const div = h('div', {classList: 'message'}, [
-    h('span', ['This is your keypair:']),
+    //h('span', ['Import a keypair:']),
     textarea,
     h('button', {onclick: function () {
-      if (textarea.value && (textarea.value.length === keys.keypair().length)) {
+      if (textarea.value && (textarea.value.length === 132)) {
         kv.set('keypair', textarea.value).then(function () {
           location.hash = ''
           location.reload()
@@ -33,6 +38,10 @@ export function keyroute (scroller) {
     }}, ['Delete Everything'])
   ])
 
-  scroller.appendChild(div)
+  if (scroller.childNodes[1]) {
+    scroller.insertBefore(div, scroller.childNodes[1])
+  } else {
+    scroller.appendChild(div)
+  }
 }
 

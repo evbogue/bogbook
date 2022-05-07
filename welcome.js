@@ -2,6 +2,7 @@ import nacl from './lib/nacl-fast-es.js'
 import { h } from './lib/misc.js'
 import { encode } from './lib/base64.js'
 import { getImage, getName } from './avatar.js'
+import { keyroute } from './routes/key.js'
 
 const kv = new IdbKvStore('ssboat')
 
@@ -12,17 +13,22 @@ function genkey (brute) {
   while (keygen.includes('/')) {
     const genkey = nacl.sign.keyPair()
     keygen = encode(genkey.publicKey) + encode(genkey.secretKey)
+    console.log(keygen.length)
     if (!keygen.includes('/')) {
-      console.log(brute.substring(0, 2))
-      if ((brute.length == 1) && keygen.startsWith(brute.substring(0, 1))) {
+      if ((brute.length) && keygen.startsWith(brute.substring(0, 1))) {
         clearInterval(interval)
         stop.parentNode.replaceChild(button, stop)
+      }
 
-      }
-      else if (brute && keygen.startsWith(brute.substring(0, 2))) {
-        clearInterval(interval)
-        stop.parentNode.replaceChild(button, stop)
-      }
+      //if ((brute.length == 1) && keygen.startsWith(brute.substring(0, 1))) {
+      //  clearInterval(interval)
+      //  stop.parentNode.replaceChild(button, stop)
+
+      //}
+      //else if (brute && keygen.startsWith(brute.substring(0, 2))) {
+      //  clearInterval(interval)
+      //  stop.parentNode.replaceChild(button, stop)
+      //}
       const keymessage = h('div', {classList:'message'}, [
         h('div', [getImage(keygen.substring(0, 44)), ' ', getName(keygen.substring(0, 44))]),
         h('div', [keygen]),
@@ -51,6 +57,12 @@ const input = h('input', {placeholder: 'Try for a key that starts with...'})
 
 let interval
 
+const importKey = h('button', {
+  onclick: function () {
+    keyroute(welcome)
+  }
+}, ['Import'])
+
 const stop = h('button', {
   onclick: function () {
     stop.parentNode.replaceChild(button, stop)
@@ -70,6 +82,9 @@ const button = h('button', {
 const intro = h('div', {classList: 'message'}, [
   'Hello! You have not generated an ed25519 keypair yet. To use this distributed social network you will need a keypair. Hold onto it to continue to use the same identity.',
   h('br'),
+  'Press generate to begin generating keypairs. When you see a keypair you want, press stop and select that keypair.',
+  h('br'),
+  importKey,
   button,
   input
   ])
