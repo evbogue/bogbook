@@ -60,13 +60,18 @@ function replicate (ws) {
   }
 }
 
+let serverId = 0
+
 export function connect (server) {
+  const id = ++serverId
+
   console.log('Connecting to ' + server)
   const ws = new WebSocket(server)
   ws.binaryType = 'arraybuffer'
 
   ws.onopen = () => {
     //ws.send(keys.pubkey())
+    peers.set(id, ws)
     replicate(ws)
   }
   
@@ -75,6 +80,7 @@ export function connect (server) {
   }
 
   ws.onclose = (e) => {
+    peers.delete(id)
     setTimeout(function () {
       connect(server)
     }, 1000)
@@ -85,6 +91,7 @@ export function connect (server) {
   ws.onerror = (err) => {
     setTimeout(function () {
       ws.close()
+      peers.delete(id)
       retryCount++
     }, 10000 * retryCount)
   }

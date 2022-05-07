@@ -6,6 +6,7 @@ import { adder } from './../adder.js'
 import { make } from './../inpfs.js'
 import { publish, open } from './../sbog.js'
 import { render } from './../render.js'
+import { blast } from './../replicate.js'
 
 function photoAdder (src, div) {
   const uploadButton = h('button', {onclick: function () {
@@ -71,9 +72,11 @@ export function query (scroller, src) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
 
-
-
   logs.query(src).then(log => {
-    adder(log, src, scroller)
+    if (log[0]) {
+      adder(log, src, scroller)
+    } else {
+      blast(JSON.stringify({req: src, seq: -1}))
+    }
   })  
 } 
