@@ -11,13 +11,13 @@ export async function publish (obj) {
   const sig = nacl.sign(tosign, decode(keys.privkey()))
   const hash = sha256.hash(sig) 
 
-  let authorfeed = logs.getFeed(obj.author)
+  let authorfeed = await logs.getLatest(obj.author)
   let previous
   if (!authorfeed) {
     previous = encode(hash)
-  } else { previous = authorfeed[0].substring(0, 44)}
+  } else { previous = authorfeed.raw.substring(0, 44)}
   const msg = encode(hash) + obj.author + previous + encode(sig) 
-  logs.addMsg(msg)
+  logs.add(msg)
   return msg
 }
 

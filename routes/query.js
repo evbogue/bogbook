@@ -76,7 +76,7 @@ export function query (scroller, src) {
     if (log[0]) {
       adder(log, src, scroller)
     } else {
-      blast(JSON.stringify({req: src, seq: -1}))
+      blast(src)
     }
   })  
 } 

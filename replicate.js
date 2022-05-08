@@ -13,23 +13,17 @@ export function blast (msg) {
 function replicate (ws) {
   // first check for my feed
   logs.query(keys.pubkey()).then(log => {
-    if (!log) {
-      ws.send(JSON.stringify({req: keys.pubkey(), seq: -1}))
-    } else {
-      ws.send(JSON.stringify({req: keys.pubkey(), seq: log.length}))
-    }
+    ws.send(keys.pubkey())
   })
 
   // next check for the route feed
 
-  const feeds = logs.getFeeds()
-
   var src = window.location.hash.substring(1)
-  if (src && !feeds[src]) {
+  if (src.length === 44) {
     console.log(src)
     logs.query(src).then(query => {
       if (!query.length) {
-        ws.send(JSON.stringify({req: src, seq: -1}))  
+        ws.send(src)  
       }
     })
   } 
@@ -41,9 +35,9 @@ function replicate (ws) {
     timer = setInterval(function () {
       //console.log('timer')
       const feeds = logs.getFeeds()
-      //console.log(feeds)
-      Object.keys(feeds).forEach(function (key, index) {
-        ws.send(JSON.stringify({req: key, seq: feeds[key].length}))
+      console.log(feeds)
+      feeds.forEach(function (feed) {
+        ws.send(feed)
       })
     }, 10000)
   }
@@ -76,6 +70,13 @@ export function connect (server) {
   }
   
   ws.onmessage = (msg) => {
+    if (msg.data.length === 44) {
+      logs.get(msg.data).then(got => {
+        if (got) {
+          ws.send(got.raw)
+        }
+      })
+    }
     console.log(msg.data)
   }
 

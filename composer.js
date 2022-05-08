@@ -8,37 +8,37 @@ import { getName, getImage } from './avatar.js'
 
 const kv = new IdbKvStore('ssboat')
 
-function getContacts (textarea, preview) {
-  const feeds = logs.getFeeds()
-  var span = h('span')
-
-  var button = h('button', {onclick: function () {
-    if (!span.childNodes[1]) {
-      var addrs = h('span')
-      span.appendChild(addrs)
-      Object.keys(feeds).forEach(function (key, index) {
-        addrs.appendChild(h('button', {onclick: function () {
-          kv.get('name:' + key).then(name => {
-            if (textarea.selectionStart || textarea.selectionEnd) {
-              textarea.value = textarea.value.substring(0, textarea.selectionStart)
-                + ' [' + name + '](' + key + ') ' +
-                textarea.value.substring(textarea.selectionEnd, textarea.value.length)
-            } else {
-              textarea.value = textarea.value + ' [' + name + '](' + key + ')'
-            }
-            preview.innerHTML = marked(textarea.value)
-          })
-        }}, [getImage(key), getName(key)]))
-      })
-    } else {
-      span.removeChild(span.childNodes[1])
-    }
-  }}, ['📇 '])
-
-  span.appendChild(button)
-
-  return span
-}
+//function getContacts (textarea, preview) {
+//  const feeds = logs.getFeeds()
+//  var span = h('span')
+//
+//  var button = h('button', {onclick: function () {
+//    if (!span.childNodes[1]) {
+//      var addrs = h('span')
+//      span.appendChild(addrs)
+//      Object.keys(feeds).forEach(function (key, index) {
+//        addrs.appendChild(h('button', {onclick: function () {
+//          kv.get('name:' + key).then(name => {
+//            if (textarea.selectionStart || textarea.selectionEnd) {
+//              textarea.value = textarea.value.substring(0, textarea.selectionStart)
+//                + ' [' + name + '](' + key + ') ' +
+//                textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+//            } else {
+//              textarea.value = textarea.value + ' [' + name + '](' + key + ')'
+//            }
+//            preview.innerHTML = marked(textarea.value)
+//          })
+//        }}, [getImage(key), getName(key)]))
+//      })
+//    } else {
+//      span.removeChild(span.childNodes[1])
+//    }
+//  }}, ['📇 '])
+//
+//  span.appendChild(button)
+//
+//  return span
+//}
 
 function photoAdder (textarea, preview) {
 
@@ -151,8 +151,8 @@ export function composer (msg) {
     preview,
     textarea,
     publishButton,
-    photoAdder(textarea, preview),
-    getContacts(textarea, preview)
+    photoAdder(textarea, preview)
+    //getContacts(textarea, preview)
   ])
 
   if (src != 'home') {
