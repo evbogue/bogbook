@@ -9,7 +9,9 @@ function processReq (req, ws) {
   if (req.length === 44) { 
     if (log[0]) {
       let got = false
-      for (let i = log.length; i >= 0; i--) {
+      for (let i = log.length -1; i >= 0; i--) {
+        console.log(log)
+        console.log(log[i])
         if (log[i].raw.includes(req)) {
           console.log('SEND THIS TO PEER')
           got = true
@@ -28,7 +30,9 @@ function processReq (req, ws) {
   }
   if (req.length > 44) {
     open(req).then(opened => {
-      console.log(opened)
+      if (opened) {
+        log.unshift(opened)
+      }
     })
   }
 }
@@ -42,7 +46,6 @@ export async function servePub (e) {
   }
 
   ws.onmessage = (e) => {
-    console.log(e.data)
     processReq(e.data, ws)
   }
 
