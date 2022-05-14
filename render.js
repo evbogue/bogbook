@@ -9,7 +9,7 @@ import { adder } from './adder.js'
 
 export async function render (msg) {
 
-  const src = msg.raw.substring(0, 44)
+  const src = msg.hash
   const messageDiv = h('div', {id: src})
   const message = h('div', {classList: 'message'})
   messageDiv.appendChild(message)

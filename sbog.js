@@ -8,7 +8,7 @@ export async function publish (data) {
 
   const hash = await make(data)
 
-  const timestamp = Date.now() + ''
+  const timestamp = Date.now()
 
   let msg = timestamp + keys.pubkey() + hash
 
@@ -29,7 +29,7 @@ export async function publish (data) {
 
 export async function open (msg) {
   const obj = {}
-  obj.timestamp = msg.substring(0, 13)
+  obj.timestamp = new Number(msg.substring(0, 13))
   obj.author = msg.substring(13, 57)
   obj.hash = msg.substring(57, 101)
   obj.previous = msg.substring(101, 145)
