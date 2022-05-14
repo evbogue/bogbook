@@ -1,36 +1,30 @@
-# Borgbook
+# Bogbook v3 (a merkle tree grows in the bogusphere)
 
-### Secure Scuttle Boat and The Innerplanetary File System
+Ok, so append only logs are annoying because they take forever to sync. And keeping data on the log is the problem, so let's consider another way to do these things.
 
-It occurred to me that I'm doing everything wrong and a log should only include a signed hash that is a link to a markdown file that itself contains links to other markdown files. These append-only logs are called "Secure Scuttle Boat" (ssb) These files are named as their sha2 hash and stored using the Innerplanetary File System (inpfs).
-
-A client consuming ssb will either download the entire log in one go, or download however much of the log they do not already have. Then upon rendering the ssbs in the client _then_ we reach out to inpfs to request the blobs when we need them. 
-
-This way initial sync of feeds is so fast you might even be able to do it on Mars, but who wants to go to Mars anyway. What people want is a fast and secure social network and ssb + inpfs = bogbook is the answer.
-
-If you happen to crashland on mars and you decide to burn your spacecraft then maybe you can transmit your log of signed hashes back to Earth and someday your inpfs will sync when the Earthlings stop having a bandwidth problem.
-
-### The Secure Scuttle Boat (ssb) protocol
-
-Is an array of signed hashes and ts and includes the previous message hash
+We need to have a block of signed hashes ordered by timestamp that is available on a server in the form of an timestamp sorted array.
 
 ```
-<hash><authorpubkey><previoushash><signatureofhash+ts>
+<ts><pubkey><hash><previous><sig>
 ```
 
-Timestamps allow us to sort the log in chronological order.
-
-### Innerplanetary File System
-
-Is a file saved as a hash of itself. In the DB or FS we will save this file as a URLencoded hash so that we avoid using slashes as slashes break the filesystem on the server.
+the sig is equal to 
 
 ```
-<hash>.md
-<hash>.mp3
-<hash>.jpg
-<hash>.png
-etc
+<ts><pubkey><hash><previous>
 ```
 
-This means you can look at the blobs with your file viewer on your computer because they are not in some obscure data storage format!
+And we only open it to confirm the block hasn't been modified
+
+Next we fetch the hash to retrieve the data. If we can't find the hash, then we keep trying servers until we find it or we simply give up.
+
+When we fetch the data we make sure that the hash is valid.
+
+Bonus, we are staying away from JSON objects so no one runs into trouble implementing the signature structure if anyone ports this to another language someday.
+
+Perhaps this is a merkle tree and we can consider the leaf nodes the data associated with the hashes? Someone can think about it and let me know if it is, or if this is somehow a different abstraction.
+
+---
+MIT
+
 

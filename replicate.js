@@ -37,6 +37,9 @@ function replicate (ws) {
       const feeds = logs.getFeeds()
       console.log(feeds)
       feeds.forEach(function (feed) {
+        logs.getLatest(feed).then(latest => {
+          ws.send(latest.raw.substring(0, 44))
+        })
         ws.send(feed)
       })
     }, 10000)
@@ -70,6 +73,7 @@ export function connect (server) {
   }
   
   ws.onmessage = (msg) => {
+    console.log(msg.data)
     if (msg.data.length === 44) {
       logs.get(msg.data).then(got => {
         if (got) {
@@ -77,7 +81,9 @@ export function connect (server) {
         }
       })
     }
-    console.log(msg.data)
+    if (msg.data.length > 44) {
+      logs.add(msg.data)
+    }
   }
 
   ws.onclose = (e) => {

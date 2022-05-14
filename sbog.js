@@ -2,35 +2,45 @@ import nacl from './lib/nacl-fast-es.js'
 import { keys } from './browserkeys.js'
 import { decode, encode } from './lib/base64.js'
 import { logs } from './browserlog.js'
+import { make, find } from './inpfs.js'
 
-export async function publish (obj) {
-  obj.author = keys.pubkey()
-  obj.timestamp = Date.now()
+export async function publish (data) {
 
-  const tosign = new TextEncoder().encode(JSON.stringify(obj))
-  const sig = nacl.sign(tosign, decode(keys.privkey()))
-  const hash = sha256.hash(sig) 
+  const hash = await make(data)
 
-  let authorfeed = await logs.getLatest(obj.author)
-  let previous
-  if (!authorfeed) {
-    previous = encode(hash)
-  } else { previous = authorfeed.raw.substring(0, 44)}
-  const msg = encode(hash) + obj.author + previous + encode(sig) 
+  const timestamp = Date.now() + ''
+
+  let msg = timestamp + keys.pubkey() + hash
+
+  const previous = await logs.getLatest(keys.pubkey())
+
+  if (!previous) {
+    msg = msg + hash
+  } else {
+    msg = msg + previous
+  }
+
+  const sig = nacl.sign(new TextEncoder().encode(msg), decode(keys.privkey()))
+
+  msg = msg + encode(sig)
   logs.add(msg)
   return msg
 }
 
 export async function open (msg) {
-  const author = msg.substring(44, 88)
-  const sig = msg.substring(132)
-  const hash = sha256(decode(sig))
-   
-  if (encode(hash) === msg.substring(0, 44)) {
-    const opened = nacl.sign.open(decode(sig), decode(author))
-    const message = JSON.parse(new TextDecoder().decode(opened))
-    message.raw = msg
-    return message
+  const obj = {}
+  obj.timestamp = msg.substring(0, 13)
+  obj.author = msg.substring(13, 57)
+  obj.hash = msg.substring(57, 101)
+  obj.previous = msg.substring(101, 145)
+  obj.text = await find(obj.hash)
+  obj.raw = msg
+
+  const opened = new TextDecoder().decode(nacl.sign.open(decode(msg.substring(145)), decode(obj.author)))
+
+  if (opened === msg.substring(0, 145)) {
+    console.log(obj)
+    return obj
   }
 }
 

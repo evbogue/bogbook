@@ -8,6 +8,7 @@ import { logs } from './browserlog.js'
 import { adder } from './adder.js'
 
 export async function render (msg) {
+
   const src = msg.raw.substring(0, 44)
   const messageDiv = h('div', {id: src})
   const message = h('div', {classList: 'message'})

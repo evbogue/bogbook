@@ -34,7 +34,7 @@ export function save () {
 }
 
 setInterval(function () {
-  if (newData) {
+  if (newData && log[0]) {
     kv.set('log', log)
     log.sort((a,b) => a.timestamp - b.timestamp)
     for (let i = log.length -1; i >= 0; i--) {
@@ -61,7 +61,7 @@ export const logs = function logs (query) {
     //  }
     //},
     getLatest: async function (pubkey) {
-      if (log.length) {
+      if (log[0]) {
         for (let i = log.length -1; i >= 0; i--) {
           if (log[i].raw.substring(44, 88) === pubkey) {
             console.log(log[i])
@@ -82,7 +82,7 @@ export const logs = function logs (query) {
     query: async function (query) {
       if (query) {
         let querylog = []
-        if (log.length) {
+        if (log[0]) {
           for (let i = log.length -1; i >= 0; i--) {
             
             if ((log[i].raw.substring(0, 44) === query) || (log[i].raw.substring(44,88) == query)) {
@@ -104,23 +104,11 @@ export const logs = function logs (query) {
     add: function (msg) {
       open(msg).then(opened => {
         if (opened) {
-          let got = false
-          if (log[0]) {
-            for (let i = log.length -1; i >= 0; i--) {
-              if (log[i].raw.substring(0, 44) === query) {
-                 got = true
-              }
-              if (i === 0 && got === false) {
-                blast(opened.raw.substring(0,44))
-                log.push(opened)
-                newData = true
-              }
-            }
-          } else {
-            blast(opened.raw.substring(0,44))
-            log.push(opened)
-            newData = true
-          }
+          log.push(opened)
+          newData = true
+        } else {
+          log.push(opened)
+          newData = true
         }
       })
     }

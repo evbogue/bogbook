@@ -14,18 +14,20 @@ export function getImage (id) {
   img.classList = 'avatar'
 
   logs.getLog().then(log => {
-    for (let i = 0; i < log.length; i++) {
-      if (log[i].imaged === id) {
-        const file = cache.get(log[i].image)
-        if (file) {
-          img.src = file
-        } else {
-          setTimeout(function () {
-            const retry = cache.get(log[i].image)
-            if (retry) {
-              img.src = retry
-            }
-          }, 1000)
+    if (log[0]) {
+      for (let i = 0; i < log.length; i++) {
+        if (log[i].imaged === id) {
+          const file = cache.get(log[i].image)
+          if (file) {
+            img.src = file
+          } else {
+            setTimeout(function () {
+              const retry = cache.get(log[i].image)
+              if (retry) {
+                img.src = retry
+              }
+            }, 1000)
+          }
         }
       }
     }
@@ -38,10 +40,12 @@ export function getName (id) {
   const nameDiv = h('span')
   nameDiv.textContent = id.substring(0, 10) + '...'
   logs.getLog().then(log => {
-    for (let i = 0; i < log.length; i++) {
-      if (log[i].named === id) {
-        nameDiv.textContent = log[i].name
-        kv.set('name:' + id, log[i].name)
+    if (log[0]) {
+      for (let i = 0; i < log.length; i++) {
+        if (log[i].named === id) {
+          nameDiv.textContent = log[i].name
+          kv.set('name:' + id, log[i].name)
+        }
       }
     }
   })

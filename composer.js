@@ -126,7 +126,7 @@ export function composer (msg) {
   const publishButton = h('button', {
     onclick: function () {
       if (textarea.value) {
-        publish({text: textarea.value}).then(msg => {
+        publish(textarea.value).then(msg => {
           open(msg).then(opened => {
             render(opened).then(rendered => {
               const getMsg = document.getElementById(src)
