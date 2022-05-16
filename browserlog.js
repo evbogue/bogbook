@@ -18,7 +18,6 @@ kv.get('log', function (err, file) {
     log.forEach(msg => {
       open(msg).then(opened => {
         if (opened) {
-          console.log(opened)
           store.set(opened.raw.substring(57, 101), opened)
         }
       })
@@ -39,7 +38,7 @@ export const logs = function logs (query) {
   return {
     getLatest: async function (author) {
       if (log[0]) {
-        for (let i = 0; i <= log.length; i++) {
+        for (let i = log.length -1; i >= 0 ; i--) {
           if (log[i].substring(13, 57) === author) {
             return log[i].substring(57, 101)
           }
@@ -67,11 +66,9 @@ export const logs = function logs (query) {
     add: function (msg) {
       open(msg).then(opened => {
         if (opened && !store.has(opened.hash)) {
-          log.unshift(msg)
+          log.push(msg)
           store.set(opened.raw.substring(57, 101), opened)
           kv.set(opened.raw.substring(57, 101), opened)
-          console.log(log)
-          console.log(store)
           newData = true
         }
       })

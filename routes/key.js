@@ -1,7 +1,7 @@
 import { h } from './../lib/misc.js'
 import { keys } from './../browserkeys.js'
 
-const kv = new IdbKvStore('ssboat')
+const kv = new IdbKvStore('merklebog')
 
 export function keyroute (scroller) {
   const textarea = h('textarea')
