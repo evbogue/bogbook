@@ -1,131 +1,79 @@
 import { open } from './sbog.js'
 import { blast } from './replicate.js'
 
-const kv = new IdbKvStore('ssboat')
+const kv = new IdbKvStore('merklebog')
+
+const store = new Map()
 
 var log = []
-//var feeds = []
-var feedlist = []
-
-kv.get('log', function (err, file) {
-  if (file) { 
-    log = file
-    log.sort((a,b) => a.timestamp - b.timestamp)
-    kv.set('log', log)
-    if (log[0]) {
-      for (let i = log.length -1; i >= 0; i--) {
-        if (!feedlist.includes(log[i].author)) {
-          feedlist.push(log[i].author)
-        }
-      }
-    }
-  }
-})
-
-//kv.get('feeds', function ( err, file) {
-//  if (file) { feeds = file }
-//})
-
-let newData = false
 
 export function save () {
   kv.set('log', log)
-//  kv.set('feeds', feeds)
 }
 
-setInterval(function () {
-  if (newData && log[0]) {
-    kv.set('log', log)
-    log.sort((a,b) => a.timestamp - b.timestamp)
-    for (let i = log.length -1; i >= 0; i--) {
-      if (!feedlist.includes(log[i].author)) {
-        feedlist.push(log[i].author)
-      }
-    }
+kv.get('log', function (err, file) {
+  if (file) {
+    log = file
+    console.log(log)
+    log.sort((a,b) => a.substring(0, 13) - b.substring(0, 13))
+    log.forEach(msg => {
+      open(msg).then(opened => {
+        if (opened) {
+          console.log(opened)
+          store.set(opened.raw.substring(57, 101), opened)
+        }
+      })
+    })
+  }
+})
 
-  //  kv.set('feeds', feeds)
-  } 
+let newData = false
+
+setInterval(function () {
+  if (newData) {
+    log.sort((a,b) => a.substring(0, 13) - b.substring(0, 13))
+    kv.set(log, log)
+  }
 }, 10000)
 
 export const logs = function logs (query) {
   return {
+    getLatest: async function (author) {
+      for (let i = log.length -1; i >= 0; i--) {
+        if (log[i].substring(13, 57) === author) {
+          return log[i].substring(57, 101)
+        }
+      }
+    },
     getLog: async function () {
       return log
     },
-    getFeeds: function () {
-      return feedlist
-    },
-    //getFeed: function (query) {
-    //  if (feeds[query]) {
-    //    return feeds[query]
-    //  }
-    //},
-    getLatest: async function (pubkey) {
-      if (log[0]) {
-        for (let i = log.length -1; i >= 0; i--) {
-          if (log[i].raw.substring(44, 88) === pubkey) {
-            console.log(log[i])
-            return log[i]
-          }
-        }
-      }
-    },
     get: async function (hash) {
-      if (log.length) {
-        for (let i = log.length -1; i >= 0; i--) {
-          if (log[i].raw.includes(hash)) {
-            return log[i]
-          }
+      let msg
+      msg = store.get(hash)
+      if (msg) {
+        return msg
+      } else {
+        msg = await kv.get(hash)
+        if (msg) {
+          store.set(msg.hash, msg)
+          return msg
+        } else {
+          blast(hash)
         }
       }
     }, 
-    query: async function (query) {
-      if (query) {
-        let querylog = []
-        if (log[0]) {
-          for (let i = log.length -1; i >= 0; i--) {
-            
-            if ((log[i].raw.substring(0, 44) === query) || (log[i].raw.substring(44,88) == query)) {
-              querylog.unshift(log[i])
-            }
-            if (query.startsWith('?')) {
-              const search = query.substring(1).replace(/%20/g, ' ').toUpperCase()
-              if (log[i].text && log[i].text.toUpperCase().includes(search)) {
-                querylog.unshift(log[i])
-              }
-            }
-            if (i === 0) {
-              return querylog
-            }
-          }
-        }
-      } 
-    },
     add: function (msg) {
       open(msg).then(opened => {
-        if (opened) {
-          log.push(opened)
-          newData = true
-        } else {
-          log.push(opened)
+        if (opened && !store.has(opened.hash)) {
+          log.push(msg)
+          store.set(opened.raw.substring(57, 101), opened)
+          kv.set(opened.raw.substring(57, 101), opened)
+          console.log(log)
+          console.log(store)
           newData = true
         }
       })
     }
-    //addMsg: function (msg) {
-    //  open(msg).then(opened => {
-    //    if (opened) {  
-    //      if (msg.substring(0, 44) === msg.substring(88, 132)) {
-    //        feeds[msg.substring(44,88)] = [msg]
-    //        log.push(opened)
-    //        newData = true
-    //      } else {
-    //        feeds[msg.substring(44,88)].unshift(msg)
-    //        log.push(opened)
-    //        newData = true
-    //      }
-    //    }
-    //  })
-    //}
   }
 }()

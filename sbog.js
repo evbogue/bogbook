@@ -39,7 +39,6 @@ export async function open (msg) {
   const opened = new TextDecoder().decode(nacl.sign.open(decode(msg.substring(145)), decode(obj.author)))
 
   if (opened === msg.substring(0, 145)) {
-    console.log(obj)
     return obj
   }
 }
