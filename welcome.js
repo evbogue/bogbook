@@ -4,7 +4,7 @@ import { encode } from './lib/base64.js'
 import { getImage, getName } from './avatar.js'
 import { keyroute } from './routes/key.js'
 
-const kv = new IdbKvStore('ssboat')
+const kv = new IdbKvStore('merklebog')
 
 export const welcome = h('div', {id: 'scroller'})
 

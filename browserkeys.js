@@ -3,7 +3,7 @@ import { decode, encode } from './lib/base64.js'
 
 export var keys
 
-const kv = new IdbKvStore('ssboat')
+const kv = new IdbKvStore('merklebog')
 
 kv.get('keypair', function (err, keypair) {
   if (!keypair) { keys = 'welcome'}

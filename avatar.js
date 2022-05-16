@@ -6,8 +6,7 @@ import { render } from './render.js'
 import { logs } from './browserlog.js'
 import { cache } from './cache.js'
 
-
-const kv = new IdbKvStore('ssboat')
+const kv = new IdbKvStore('merklebog')
 
 export function getImage (id) {
   let img = vb(decode(id), 256)

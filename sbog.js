@@ -6,24 +6,27 @@ import { make, find } from './inpfs.js'
 
 export async function publish (data) {
 
-  const hash = await make(data)
+  const datahash = await make(data)
 
   const timestamp = Date.now()
 
-  let msg = timestamp + keys.pubkey() + hash
+  let msg = timestamp + keys.pubkey() + datahash
 
-  const previous = await logs.getLatest(keys.pubkey())
+  const hash = encode(sha256(new TextEncoder().encode(msg)))
+
+  let previous = await logs.getLatest(keys.pubkey())
 
   if (!previous) {
-    msg = msg + hash
-  } else {
-    msg = msg + previous
+    previous = hash
   }
 
-  const sig = nacl.sign(new TextEncoder().encode(msg), decode(keys.privkey()))
+  msg = timestamp + keys.pubkey() + hash + previous + datahash
+  
+  const sig = encode(nacl.sign(new TextEncoder().encode(msg), decode(keys.privkey())))
 
-  msg = msg + encode(sig)
+  msg = msg + sig
   logs.add(msg)
+  console.log(msg)
   return msg
 }
 
@@ -33,12 +36,15 @@ export async function open (msg) {
   obj.author = msg.substring(13, 57)
   obj.hash = msg.substring(57, 101)
   obj.previous = msg.substring(101, 145)
-  obj.text = await find(obj.hash)
+  obj.data = msg.substring(145, 189)
+  obj.text = await find(obj.data)
   obj.raw = msg
 
-  const opened = new TextDecoder().decode(nacl.sign.open(decode(msg.substring(145)), decode(obj.author)))
+  console.log(obj)
 
-  if (opened === msg.substring(0, 145)) {
+  const opened = new TextDecoder().decode(nacl.sign.open(decode(msg.substring(189)), decode(obj.author)))
+
+  if (opened === msg.substring(0, 189)) {
     return obj
   }
 }

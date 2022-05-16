@@ -13,9 +13,8 @@ export function save () {
 
 kv.get('log', function (err, file) {
   if (file) {
-    log = file
-    console.log(log)
     log.sort((a,b) => a.substring(0, 13) - b.substring(0, 13))
+    log = file
     log.forEach(msg => {
       open(msg).then(opened => {
         if (opened) {
@@ -39,11 +38,13 @@ setInterval(function () {
 export const logs = function logs (query) {
   return {
     getLatest: async function (author) {
-      for (let i = log.length -1; i >= 0; i--) {
-        if (log[i].substring(13, 57) === author) {
-          return log[i].substring(57, 101)
+      if (log[0]) {
+        for (let i = 0; i <= log.length; i++) {
+          if (log[i].substring(13, 57) === author) {
+            return log[i].substring(57, 101)
+          }
         }
-      }
+      } else { return undefined }
     },
     getLog: async function () {
       return log
@@ -66,7 +67,7 @@ export const logs = function logs (query) {
     add: function (msg) {
       open(msg).then(opened => {
         if (opened && !store.has(opened.hash)) {
-          log.push(msg)
+          log.unshift(msg)
           store.set(opened.raw.substring(57, 101), opened)
           kv.set(opened.raw.substring(57, 101), opened)
           console.log(log)

@@ -5,13 +5,19 @@ Ok, so append only logs are annoying because they take forever to sync. And keep
 We need to have a block of signed hashes ordered by timestamp that is available on a server in the form of an timestamp sorted array.
 
 ```
-<ts><pubkey><hash><previous><sig>
+<ts><pubkey><hash><previous><datahash><sig>
+```
+
+and the hash is a hash of 
+
+```
+<ts><pubkey><datahash>
 ```
 
 the sig is equal to 
 
 ```
-<ts><pubkey><hash><previous>
+<ts><pubkey><hash><previous><datahash>
 ```
 
 And we only open it to confirm the block hasn't been modified

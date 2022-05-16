@@ -1,11 +1,15 @@
 import { render } from './render.js' 
+import { logs } from './browserlog.js'
+import { open } from './sbog.js'
 
 async function addPosts (posts, div) {
   posts.forEach(msg => {
-    const getMsg = document.getElementById(msg.raw.substring(0, 44))
+    const getMsg = document.getElementById(msg.substring(57, 101))
     if (!getMsg) {
-      render(msg).then(rendered => {
-        div.appendChild(rendered)
+      logs.get(msg.substring(57, 101)).then(got => {
+        render(got).then(rendered => {
+          div.appendChild(rendered)
+        })
       })
     }
   })
