@@ -88,7 +88,7 @@ export function composer (msg) {
   let src
 
   if (msg) {
-    src = msg.raw.substring(0, 44)
+    src = msg.raw.substring(57, 101)
   } else {
     src = 'home'
   }

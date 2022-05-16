@@ -48,6 +48,7 @@ function photoAdder (src, div) {
 
   return buttonsDiv
 }
+
 export function query (scroller, src) {
   const messageDiv = h('div')
   scroller.appendChild(messageDiv)
@@ -71,7 +72,7 @@ export function query (scroller, src) {
   } else if (src.startsWith('?')) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
-
+  console.log('QUERYROUTE: ' + src)
   logs.query(src).then(log => {
     if (log[0]) {
       adder(log, src, scroller)

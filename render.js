@@ -87,9 +87,9 @@ export async function render (msg) {
 
   messageDiv.appendChild(replyDiv)
 
-  /*logs.query('?' + src).then(log => {
+  logs.query('?' + src).then(log => {
     adder(log, src, replyDiv)
-  })*/
+  })
 
   return messageDiv
 } 

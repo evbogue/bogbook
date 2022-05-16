@@ -48,6 +48,31 @@ export const logs = function logs (query) {
     getLog: async function () {
       return log
     },
+    query: async function (query) {
+      console.log('LOOKING FOR MATCHES TO ' + query)
+      if (log[0]) {
+        const querylog = []
+        for (let i = log.length -1; i >= 0 ; i--) {
+          if (log[i].substring(13, 57) === query) {
+            querylog.unshift(log[i])
+          }
+          if (log[i].substring(57, 101) === query) {
+            querylog.unshift(log[i])
+          }
+          if (query.startsWith('?')) {
+            const msg = store.get(log[i].substring(57, 101))
+            const search = query.substring(1).replace(/%20/g, ' ').toUpperCase()
+            if (msg.text && msg.text.toUpperCase().includes(search)) {
+              querylog.unshift(msg.raw)
+            }
+          }
+          if (i === 0) {
+            console.log(querylog)
+            return querylog
+          }
+        }
+      }
+    },
     get: async function (hash) {
       let msg
       msg = store.get(hash)
