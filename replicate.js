@@ -12,44 +12,40 @@ export function blast (msg) {
 
 function replicate (ws) {
   // first check for my feed
-  logs.query(keys.pubkey()).then(log => {
-    ws.send(keys.pubkey())
-  })
+  ws.send(keys.pubkey())
 
   // next check for the route feed
-
   var src = window.location.hash.substring(1)
   if (src.length === 44) {
     console.log(src)
     logs.query(src).then(query => {
       if (!query.length) {
+        console.log('we do not have it')
         ws.send(src)  
       }
     })
   } 
 
-  // next check for updates to existing feeds on repeat
-  var timer
 
-  function start () {
-    timer = setInterval(function () {
-      //console.log('timer')
-      const feeds = logs.getFeeds()
-      console.log(feeds)
-      feeds.forEach(function (feed) {
-        logs.getLatest(feed).then(latest => {
-          ws.send(latest.raw.substring(0, 44))
-        })
-        ws.send(feed)
-      })
-    }, 10000)
-  }
+  //function start () {
+  //  timer = setInterval(function () {
+  //    //console.log('timer')
+  //    const feeds = logs.getFeeds()
+  //    console.log(feeds)
+  //    feeds.forEach(function (feed) {
+  //      logs.getLatest(feed).then(latest => {
+  //        ws.send(latest.raw.substring(0, 44))
+  //      })
+  //      ws.send(feed)
+  //    })
+  //  }, 10000)
+  //}
 
-  start()
+  //start()
 
   // if connection closes we clear the timer and try to reconnect
   ws.onclose = (e) => {
-    clearInterval(timer)
+    //clearInterval(timer)
     setTimeout(function () {
       console.log('connection to ' + ws.url + ' closed, reconnecting')
       connect(ws.url, keys)
@@ -58,6 +54,20 @@ function replicate (ws) {
 }
 
 let serverId = 0
+
+function processReq (req, ws) {
+  if (req.length === 44) {
+    console.log('check to see if '+ req + ' is a feed')
+    logs.getLatest(req).then(latest => {
+      if (latest) {
+        console.log('yes it is a feed')
+        logs.get(latest).then(got => {
+          ws.send(got.raw)
+        })
+      }
+    })    
+  }
+}
 
 export function connect (server) {
   const id = ++serverId
@@ -73,17 +83,7 @@ export function connect (server) {
   }
   
   ws.onmessage = (msg) => {
-    console.log(msg.data)
-    if (msg.data.length === 44) {
-      logs.get(msg.data).then(got => {
-        if (got) {
-          ws.send(got.raw)
-        }
-      })
-    }
-    if (msg.data.length > 44) {
-      logs.add(msg.data)
-    }
+    processReq(msg.data, ws)
   }
 
   ws.onclose = (e) => {

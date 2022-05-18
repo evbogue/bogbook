@@ -49,7 +49,6 @@ export const logs = function logs (query) {
       return log
     },
     query: async function (query) {
-      console.log('LOOKING FOR MATCHES TO ' + query)
       if (log[0]) {
         const querylog = []
         for (let i = log.length -1; i >= 0 ; i--) {
@@ -67,7 +66,6 @@ export const logs = function logs (query) {
             }
           }
           if (i === 0) {
-            console.log(querylog)
             return querylog
           }
         }

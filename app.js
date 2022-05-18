@@ -12,7 +12,7 @@ function start () {
   } else if (keys) {
     const proto = window.location.protocol === 'https:' ? 'wss://' : 'ws://'
     const server = [proto + window.location.host + '/ws']
-    //connect(server)
+    connect(server)
     route()
     navbar() 
   } else {

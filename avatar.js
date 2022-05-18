@@ -3,8 +3,9 @@ import { decode } from './lib/base64.js'
 import { keys } from './browserkeys.js'
 import { publish, open } from './sbog.js'
 import { render } from './render.js'
-import { logs } from './browserlog.js'
+import { logs, save } from './browserlog.js'
 import { cache } from './cache.js'
+import { make, find } from './inpfs.js'
 
 const kv = new IdbKvStore('merklebog')
 
@@ -41,10 +42,19 @@ export function getName (id) {
   logs.getLog().then(log => {
     if (log[0]) {
       for (let i = 0; i < log.length; i++) {
-        if (log[i].named === id) {
-          nameDiv.textContent = log[i].name
-          kv.set('name:' + id, log[i].name)
-        }
+        logs.get(log[i].substring(57, 101)).then(msg => {
+          console.log(msg)
+          find(msg.data).then(data => {
+            if (data.startsWith('name:')) {
+              find(data.substring(5, 49)).then(name => {
+                if (name) {
+                  nameDiv.textContent = name
+                  kv.set('name:' + id, name) 
+                }
+              })
+            }
+          })
+        })
       }
     }
   })
@@ -74,11 +84,13 @@ export function newName (id, div) {
         alert('Error: Names cannot be the same length as your keypair!')
       }
       if (input.value) {
-        const obj = {name: input.value, named: id}
-        publish(obj).then(msg => {
-          open(msg).then(opened => {
-            render(opened).then(rendered => {
-              div.appendChild(rendered)
+        make(input.value).then(made => {
+          publish('name:' + made + id).then(msg => {
+            open(msg).then(opened => {
+              render(opened).then(rendered => {
+                div.appendChild(rendered)
+              })
+              save()
             })
           })
         })

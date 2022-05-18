@@ -6,6 +6,7 @@ import { composer } from './composer.js'
 import { keys } from './browserkeys.js'
 import { logs } from './browserlog.js'
 import { adder } from './adder.js'
+import { find } from './inpfs.js'
 
 export async function render (msg) {
 
@@ -44,44 +45,89 @@ export async function render (msg) {
     }
   }}, ['Reply'])
 
-  if (msg.text) {
-    const content = h('div', {innerHTML: markdown(msg.text)})
-    setTimeout(function () {
-      content.innerHTML = markdown(msg.text)
-    }, 1000)
-    message.appendChild(content)
-    message.appendChild(reply)
-  }
+  function contentRender(data, message) {
+    if (data.startsWith('image:')) {
 
-  if (msg.name) {
-    const content = h('span', [
-      ' named ', 
-      h('a', {href: '#' + msg.named}, [msg.name])
-    ])
-    message.appendChild(content)
-  }
-
-  if (msg.image) {
-    const img = h('img', {classList: 'thumb'})
-    const link = h('a', { href: '#' + msg.imaged}, [getName(msg.imaged)])
-    const content = h('span', [
-      ' posted an image of ',
-      link, 
-      ' '
-    ])
-    const image = cache.get(msg.image)
-    if (image) {
-      content.appendChild(h('img', {classList: 'avatar', src: image}))
-    } else {
+    } 
+    if (data.startsWith('name:')) {
+      console.log(data)
+      const named = data.substring(49)
+      find(data.substring(5, 49)).then(data => {
+        if (data) {
+          const content = h('span', [
+            ' named ',
+            h('a', {href: '#' + named}, [data])
+          ])
+          message.appendChild(content)
+        } 
+      }) 
+    } else if (data) {
+      const content = h('div', {innerHTML: markdown(data)})
       setTimeout(function () {
-        const retry = cache.get(msg.image)
-        if (retry) {
-          content.appendChild(h('img', {classList: 'avatar', src: retry}))
-        }
+        content.innerHTML = markdown(data)
       }, 1000)
+      message.appendChild(content)
+      message.appendChild(reply)
     }
-    message.appendChild(content) 
   }
+
+  find(msg.data).then(data => {
+    if (data) {
+      contentRender(data, message)
+    } 
+    if (!data) {
+      // do this in inpfs module blast(msg.data)
+      setTimeout(function () {
+        find(msg.data).then(data => {
+          if (data) {
+            contentRender(data, message)
+          }
+          if (!data) {
+            message.appendChild(h('div', ['Not Found.']))
+          }
+        })
+      }, 5000)
+    }
+  })
+
+  //if (msg.text) {
+  //  const content = h('div', {innerHTML: markdown(msg.text)})
+  //  setTimeout(function () {
+  //    content.innerHTML = markdown(msg.text)
+  //  }, 1000)
+  //  message.appendChild(content)
+  //  message.appendChild(reply)
+  //}
+
+  //if (msg.name) {
+  //  const content = h('span', [
+  //    ' named ', 
+  //    h('a', {href: '#' + msg.named}, [msg.name])
+  //  ])
+  //  message.appendChild(content)
+  //}
+
+  //if (msg.image) {
+  //  const img = h('img', {classList: 'thumb'})
+  //  const link = h('a', { href: '#' + msg.imaged}, [getName(msg.imaged)])
+  //  const content = h('span', [
+  //    ' posted an image of ',
+  //    link, 
+  //    ' '
+  //  ])
+  //  const image = cache.get(msg.image)
+  //  if (image) {
+  //    content.appendChild(h('img', {classList: 'avatar', src: image}))
+  //  } else {
+  //    setTimeout(function () {
+  //      const retry = cache.get(msg.image)
+  //      if (retry) {
+  //        content.appendChild(h('img', {classList: 'avatar', src: retry}))
+  //      }
+  //    }, 1000)
+  //  }
+  //  message.appendChild(content) 
+  //}
 
   const replyDiv = h('div', {classList: 'indent'})
 

@@ -23,12 +23,11 @@ function photoAdder (src, div) {
     const reader = new FileReader()
     reader.onloadend = function () {
       img.src = reader.result
-      console.log(img.src)
       make(img.src).then(hash => {
         const imgDiv = h('div', [
           img,
           h('button', { onclick: function () {
-            publish({image: hash, imaged: src}).then(msg => {
+            publish('image:' + hash + src).then(msg => {
               open(msg).then(opened => {
                 render(opened).then(rendered => {
                   div.appendChild(rendered)
@@ -38,7 +37,6 @@ function photoAdder (src, div) {
             })
           }}, ['Publish'])
         ])
-        console.log(hash)
         buttonsDiv.appendChild(imgDiv)
       })
     }
@@ -72,12 +70,11 @@ export function query (scroller, src) {
   } else if (src.startsWith('?')) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
-  console.log('QUERYROUTE: ' + src)
   logs.query(src).then(log => {
     if (log[0]) {
       adder(log, src, scroller)
     } else {
       blast(src)
     }
-  })  
-} 
+  })
+}

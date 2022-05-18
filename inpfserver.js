@@ -1,7 +1,5 @@
 import { encode } from './lib/base64.js'
 
-const kv = new IdbKvStore('inpfs')
-
 export async function make (file) {
   // the inner planetary file system creates a sha256 hash that we can use to look up the file 
   const hash = encode(

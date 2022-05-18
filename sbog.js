@@ -26,7 +26,6 @@ export async function publish (data) {
 
   msg = msg + sig
   logs.add(msg)
-  console.log(msg)
   return msg
 }
 
@@ -37,10 +36,8 @@ export async function open (msg) {
   obj.hash = msg.substring(57, 101)
   obj.previous = msg.substring(101, 145)
   obj.data = msg.substring(145, 189)
-  obj.text = await find(obj.data)
+  //should be at render obj.text = await find(obj.data)
   obj.raw = msg
-
-  console.log(obj)
 
   const opened = new TextDecoder().decode(nacl.sign.open(decode(msg.substring(189)), decode(obj.author)))
 
