@@ -1,5 +1,7 @@
 import { keys } from './keys.js'
 import { open } from './denobog.js'
+import { encode } from './lib/base64.js'
+
 
 const sockets = new Set()
 
@@ -36,19 +38,23 @@ function processReq (req, ws) {
       console.log('no log yet, sending req back hoping for a message')
       ws.send(req)
     } else if (store.has(req)) {
-        console.log('we have it, sending it')
-        ws.send(store.get(req).raw)
+      const file = store.get(req)
+      if (!(typeof(file) === 'object') && file.substring(0, 5) === 'blob:') {
+        console.log('this is a blob')
+        ws.send('blob:' + req + file.substring(5))
+      } else {
+        console.log('we have the post ' + req + ' sending it')
+        ws.send(file.raw)
+      }
     } else if (!store.has(req)) {
-      console.log('checking if this is an author feed')
+      console.log('checking if ' + req + ' is an author pubkey')
       getLatest(req).then(latest => {
         if (latest) {
-          console.log('THIS IS A FEED, latest message: ' + latest)
+          console.log('yes it is a pubkey, sending: ' + latest)
           const msg = store.get(latest)
-          console.log(msg)
-          console.log(msg.raw)
           ws.send(msg.raw)
         } if (!latest) {
-          console.log('we do not have it')
+          console.log('we do not have it asking for' + req )
           ws.send(req)
           blastcache.push(req)
         }
@@ -56,24 +62,41 @@ function processReq (req, ws) {
     }
   } 
   if (req.length > 44) {
-    open(req).then(opened => {
-      if (opened && !store.has(opened.hash)) {
-        log.push(req)
-        store.set(opened.hash, opened)
-        console.log('added ' + opened.hash + ' by ' + opened.author)
-        // then we need to make sure we have the data associated with the post
-        if (!store.has(opened.data)) {
-          //ws.send(opened.data)
+    if (req.startsWith('blob:')) {
+      console.log('this is a blob')
+      const hash = req.substring(5, 49)
+      console.log(hash)
+      const file = req.substring(49)
+      console.log(file)
+      crypto.subtle.digest("SHA-256", new TextEncoder().encode(file)).then(digest => {
+        const verify = encode(digest)
+        console.log('VERIFY:' + verify)
+        if (hash === verify) {
+          console.log('saving blob as ' + hash + ' blob:' + file)
+          store.set(hash, 'blob:' + file)
         }
-        if (!store.has(opened.previous)) { 
-          console.log('requesting ' + opened.previous)
-          ws.send(opened.previous)
+      })
+    } else {
+      open(req).then(opened => {
+        if (opened && !store.has(opened.hash)) {
+          log.push(req)
+          store.set(opened.hash, opened)
+          console.log('added ' + opened.hash + ' by ' + opened.author)
+          // then we need to make sure we have the data associated with the post
+          if (!store.has(opened.data)) {
+            ws.send(opened.data)
+          }
+          if (!store.has(opened.previous)) { 
+            console.log('requesting ' + opened.previous)
+            ws.send(opened.previous)
+          }
         }
-      }
-      if (!opened && !store.has(opened.hash)) {
-        console.log('maybe this is a data blob?') 
-      }
-    })
+        if (!opened && !store.has(opened.hash)) {
+          console.log('maybe this is a data blob?')
+          console.log(req) 
+        }
+      })
+    }
   }
 }
 

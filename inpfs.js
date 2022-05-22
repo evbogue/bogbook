@@ -1,4 +1,5 @@
 import { encode } from './lib/base64.js'
+import { blast } from './replicate.js'
 
 const kv = new IdbKvStore('inpfs')
 
@@ -8,10 +9,12 @@ export async function make (file) {
 
   //and then we save the inpfs file using the inpns filename in the browser's IndexedDb for easy access
   kv.set(hash, file)
+  blast('blob:' + hash+file)
   return hash
 }
 
 export async function find (inpns) {
+  console.log('Looking:' + inpns)
   const file = await kv.get(inpns)
 
   if (file) {
@@ -20,5 +23,10 @@ export async function find (inpns) {
     if (inpns === verify) {
       return file
     }
+  } 
+  if (!file) {
+    console.log('WE DONT HAVE THE FILE')
+    blast(inpns)
+    //return null
   }
 }

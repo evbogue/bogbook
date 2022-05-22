@@ -2,18 +2,26 @@ import { keys } from './browserkeys.js'
 import { logs } from './browserlog.js'
 import { render } from './render.js'
 import { open } from './sbog.js'
+import { make, find } from './inpfs.js'
+import { encode } from './lib/base64.js'
 
 const peers = new Map()
 
 let blastcache = []
 
 setTimeout(function () {
+  blastcache.forEach(value => {
+    blast(value)
+  })
   blastcache = []
 }, 10000)
 
 export function blast (msg) {
+  console.log('BLAST:' + msg)
+  console.log(peers)
   for (const peer of peers.values()) {
     if (!blastcache.includes(msg)) {
+      //console.log(msg)
       blastcache.push(msg)
       peer.send(msg)
     } 
@@ -34,10 +42,10 @@ function replicate (ws) {
   // next check for the route feed
   var src = window.location.hash.substring(1)
   if (src.length === 44) {
-    console.log(src)
+    //console.log(src)
     logs.query(src).then(query => {
       if (!query.length && !blastcache.includes(src)) {
-        console.log('we do not have it')
+        //console.log('we do not have it')
         blastcache.push(src)
         ws.send(src)  
       }
@@ -56,7 +64,7 @@ function replicate (ws) {
           }
           if (i === 0 && feeds[0]) {
             feeds.forEach(feed => {
-              console.log(feed)
+              //console.log(feed)
               ws.send(feed) 
             })
           }
@@ -81,48 +89,76 @@ let serverId = 0
 
 function processReq (req, ws) {
   if (req.length === 44) {
+    let gotit = false
     console.log('check to see if '+ req + ' is a feed')
     logs.getLatest(req).then(latest => {
       if (latest) {
-        console.log('yes it is a feed')
+        console.log(req  + ' is a feed we have, sending')
         logs.get(latest).then(got => {
           if (got) {
+            gotit = true
             ws.send(got.raw)
           }
         })
       } else {
         logs.get(req).then(post => {
           if (post) {
-            console.log('it is a post')
+            gotit = true
+            console.log(req + ' is a post, sending')
             ws.send(post.raw)
-          }
+          } 
         })
       }
-    })    
-  } 
-  if (req.length > 44) {
-    open(req).then(opened => {
-      if (opened) {
-        logs.get(opened.hash).then(got => {
-          if (got) {
-            console.log(opened.hash)
-            console.log('we already have this message')
-            console.log(opened)
-          } if (!got) {
-            console.log('we do not have it, add to db')
-            logs.add(req)
-            if (opened.previous != opened.hash) { 
-              ws.send(opened.previous)
-            }
-            const scroller = document.getElementById('scroller')
-            render(opened).then(rendered => {
-              scroller.insertBefore(rendered, scroller.childNodes[1])
-              //scroller.appendChild(rendered)
-            })           
-          }
-        })
+    }) 
+
+    find(req).then(file => {
+      if (file) {
+        gotit = true
+        console.log(req + ' is a blob, sending')
+        console.log(file)
+        ws.send('blob:' + req + file)
       }
     })
+    setTimeout(function () {
+      if (!gotit) {
+        console.log('WE do not have '+ req +', blasting for it ')
+        blast(req)
+      }
+    })
+  } 
+  if (req.length > 44) {
+    if (req.startsWith('blob')) {
+      console.log('THIS IS A BLOB')
+      const hash = req.substring(5, 49)
+      const file = req.substring(49)
+      const verify = encode(sha256(new TextEncoder().encode(file)))
+      if (hash == verify) {
+        make(file)
+      }
+    } else {
+      open(req).then(opened => {
+        if (opened) {
+          logs.get(opened.hash).then(got => {
+            if (got) {
+              //console.log(opened.hash)
+              console.log('we already have this message')
+              //console.log(opened)
+            } if (!got) {
+              console.log('we do not have it, add to db')
+              logs.add(req)
+              if (opened.previous != opened.hash) { 
+                ws.send(opened.previous)
+              }
+              const scroller = document.getElementById('scroller')
+              render(opened).then(rendered => {
+                scroller.insertBefore(rendered, scroller.childNodes[1])
+                //scroller.appendChild(rendered)
+              })           
+            }
+          })
+        }
+      })
+    }
       //if (opened && !store.has(opened.hash)) {
       //  log.unshift(req)
       //  store.set(opened.hash, opened)
