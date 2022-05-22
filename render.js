@@ -21,8 +21,17 @@ export async function render (msg) {
     timestamp.textContent = human(new Date(msg.timestamp))
   }, 10000)
 
+  const merklenav = h('code')
+
+  if (msg.previous != msg.hash) {
+    merklenav.appendChild(h('a', {href: '#' + msg.previous}, ['prev']))
+  } else {
+    merklenav.appendChild(h('code', ['root']))
+  } 
   message.appendChild(h('span', {classList: 'right'}, [
     h('code', [msg.author.substring(0, 7)]),
+    ' ',
+    merklenav,
     ' ',
     timestamp
   ]))

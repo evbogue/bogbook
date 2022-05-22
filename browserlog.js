@@ -42,6 +42,9 @@ export const logs = function logs (query) {
           if (log[i].substring(13, 57) === author) {
             return log[i].substring(57, 101)
           }
+          if (i === 0) {
+            return undefined
+          }
         }
       } else { return undefined }
     },
@@ -90,9 +93,10 @@ export const logs = function logs (query) {
       open(msg).then(opened => {
         if (opened && !store.has(opened.hash)) {
           log.push(msg)
-          store.set(opened.raw.substring(57, 101), opened)
-          kv.set(opened.raw.substring(57, 101), opened)
-          newData = true
+          store.set(opened.hash, opened)
+          kv.set(opened.hash, opened)
+          save()
+          blast(opened.hash)
         }
       })
     }

@@ -43,9 +43,9 @@ export function getName (id) {
     if (log[0]) {
       for (let i = 0; i < log.length; i++) {
         logs.get(log[i].substring(57, 101)).then(msg => {
-          console.log(msg)
+          //console.log(msg)
           find(msg.data).then(data => {
-            if (data.startsWith('name:')) {
+            if (data && data.startsWith('name:') && (data.substring(49) == id)) {
               find(data.substring(5, 49)).then(name => {
                 if (name) {
                   nameDiv.textContent = name
