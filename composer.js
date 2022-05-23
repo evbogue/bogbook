@@ -96,6 +96,9 @@ export function composer (msg) {
   if (src.length === 44) {
     kv.get('name:' + msg.author).then(name => {
       var select = window.getSelection().toString()
+      if (!name) {
+        name = msg.author.substring(0, 10) + '...'
+      }
       if (msg.author === src) {
         textarea.value = '[' + name + '](' + msg.author + ')'
       } else {
@@ -106,14 +109,14 @@ export function composer (msg) {
 
   textarea.addEventListener('input', function (e) {
     if (textarea.value) {
-      kv.set(src, textarea.value)
+      kv.set('draft:' + src, textarea.value)
     } else {
-      kv.remove(src)
+      kv.remove('draft' + src)
     }
     preview.innerHTML = markdown(textarea.value)
   })
 
-  kv.get(src).then(got => {
+  kv.get('draft:' +  src).then(got => {
     if (got) {
       textarea.value = got
       preview.innerHTML = markdown(textarea.value)
