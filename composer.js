@@ -141,7 +141,7 @@ export function composer (msg) {
               }
               preview.innerHTML = ''
               textarea.value = ''
-              kv.remove(src)
+              kv.remove('draft:' + src)
               save()
             }) 
           })

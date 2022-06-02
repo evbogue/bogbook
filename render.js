@@ -56,16 +56,25 @@ export async function render (msg) {
 
   function contentRender(data, message) {
     if (data.startsWith('image:')) {
-
-    } 
-    if (data.startsWith('name:')) {
       console.log(data)
+      const named = data.substring(50)
+      find(data.substring(6, 50)).then(file => {
+        if (file) {
+          const content = h('span', [
+            ' imaged ',
+            h('a', {href: '#' + named}, [h('img', {classList: 'avatar', src: file})])
+          ])
+          message.appendChild(content)
+        }
+      })
+    } 
+    else if (data.startsWith('name:')) {
       const named = data.substring(49)
-      find(data.substring(5, 49)).then(data => {
-        if (data) {
+      find(data.substring(5, 49)).then(file => {
+        if (file) {
           const content = h('span', [
             ' named ',
-            h('a', {href: '#' + named}, [data])
+            h('a', {href: '#' + named}, [file])
           ])
           message.appendChild(content)
         } 
@@ -95,7 +104,7 @@ export async function render (msg) {
             message.appendChild(h('div', ['Not Found.']))
           }
         })
-      }, 5000)
+      }, 1000)
     }
   })
 

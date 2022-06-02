@@ -14,7 +14,7 @@ export async function make (file) {
 }
 
 export async function find (inpns) {
-  console.log('Looking:' + inpns)
+  //console.log('Looking:' + inpns)
   const file = await kv.get(inpns)
 
   if (file) {
@@ -25,7 +25,7 @@ export async function find (inpns) {
     }
   } 
   if (!file) {
-    console.log('WE DONT HAVE THE FILE')
+    //console.log('WE DONT HAVE THE FILE')
     blast(inpns)
     //return null
   }

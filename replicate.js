@@ -17,8 +17,8 @@ setTimeout(function () {
 }, 10000)
 
 export function blast (msg) {
-  console.log('BLAST:' + msg)
-  console.log(peers)
+  //console.log('BLAST:' + msg)
+  //console.log(peers)
   for (const peer of peers.values()) {
     if (!blastcache.includes(msg)) {
       //console.log(msg)
@@ -59,13 +59,16 @@ function replicate (ws) {
       const feeds = []
       logs.getLog().then(log => {
         for (let i = log.length - 1; i >= 0 ; i--) {
-          if (!feeds.includes(log[i].substring(13, 57))) {
-            feeds.push(log[i].substring(13, 57))
+          if (!feeds.includes(log[i].author)) {
+            feeds.push(log[i].author)
           }
+          //if (!feeds.includes(log[i].substring(13, 57))) {
+          //  feeds.push(log[i].substring(13, 57))
+          //}
           if (i === 0 && feeds[0]) {
             feeds.forEach(feed => {
               //console.log(feed)
-              ws.send(feed) 
+              ws.send(feed)
             })
           }
         }
@@ -90,10 +93,10 @@ let serverId = 0
 function processReq (req, ws) {
   if (req.length === 44) {
     let gotit = false
-    console.log('check to see if '+ req + ' is a feed')
+    //console.log('check to see if '+ req + ' is a feed')
     logs.getLatest(req).then(latest => {
       if (latest) {
-        console.log(req  + ' is a feed we have, sending')
+        //console.log(req  + ' is a feed we have, sending')
         logs.get(latest).then(got => {
           if (got) {
             gotit = true
@@ -104,7 +107,7 @@ function processReq (req, ws) {
         logs.get(req).then(post => {
           if (post) {
             gotit = true
-            console.log(req + ' is a post, sending')
+            //console.log(req + ' is a post, sending')
             ws.send(post.raw)
           } 
         })
@@ -114,21 +117,21 @@ function processReq (req, ws) {
     find(req).then(file => {
       if (file) {
         gotit = true
-        console.log(req + ' is a blob, sending')
-        console.log(file)
+        //console.log(req + ' is a blob, sending')
+        //console.log(file)
         ws.send('blob:' + req + file)
       }
     })
     setTimeout(function () {
       if (!gotit) {
-        console.log('WE do not have '+ req +', blasting for it ')
+        //console.log('WE do not have '+ req +', blasting for it ')
         blast(req)
       }
-    })
+    }, 1000)
   } 
   if (req.length > 44) {
     if (req.startsWith('blob')) {
-      console.log('THIS IS A BLOB')
+      //console.log('THIS IS A BLOB')
       const hash = req.substring(5, 49)
       const file = req.substring(49)
       const verify = encode(sha256(new TextEncoder().encode(file)))
@@ -141,10 +144,10 @@ function processReq (req, ws) {
           logs.get(opened.hash).then(got => {
             if (got) {
               //console.log(opened.hash)
-              console.log('we already have this message')
+              //console.log('we already have this message')
               //console.log(opened)
             } if (!got) {
-              console.log('we do not have it, add to db')
+              //console.log('we do not have it, add to db')
               logs.add(req)
               if (opened.previous != opened.hash) { 
                 ws.send(opened.previous)

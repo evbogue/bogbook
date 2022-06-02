@@ -4,13 +4,16 @@ import { open } from './sbog.js'
 
 async function addPosts (posts, div) {
   posts.forEach(msg => {
-    const getMsg = document.getElementById(msg.substring(57, 101))
+    const getMsg = document.getElementById(msg.hash)
     if (!getMsg) {
-      logs.get(msg.substring(57, 101)).then(got => {
-        render(got).then(rendered => {
-          div.appendChild(rendered)
-        })
+      render(msg).then(rendered => {
+        div.appendChild(rendered)
       })
+      //logs.get(msg.substring(57, 101)).then(got => {
+      //  render(got).then(rendered => {
+      //    div.appendChild(rendered)
+      //  })
+      //})
     }
   })
 }
