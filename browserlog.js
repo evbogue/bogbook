@@ -114,6 +114,7 @@ export const logs = function logs (query) {
           arraystore.push(opened)
           //store.set(opened.hash, opened)
           //kv.set(opened.hash, opened)
+          newData = true
           save()
           blast(opened.hash)
         }
