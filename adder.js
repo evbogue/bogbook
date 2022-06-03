@@ -19,7 +19,7 @@ async function addPosts (posts, div) {
 }
 
 export function adder (log, src, div) {
-  if (log[0]) {
+  if (log && log[0]) {
     let index = 0
 
     var reverse = log.slice().reverse()
