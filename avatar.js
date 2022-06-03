@@ -14,15 +14,17 @@ export function getImage (id) {
   img.classList = 'avatar'
 
   logs.query(id).then(querylog => {
-    querylog.forEach(msg => {
-      if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
-        find(msg.text.substring(6,50)).then(data => {
-          if (data) {
-            img.src = data
-          }
-        })
-      }
-    })
+    if (querylog[0]) {
+      querylog.forEach(msg => {
+        if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
+          find(msg.text.substring(6,50)).then(data => {
+            if (data) {
+              img.src = data
+            }
+          })
+        }
+      })
+    }
   })
   //logs.getLog().then(log => {
   //  if (log[0]) {
@@ -51,16 +53,18 @@ export function getName (id) {
   const nameDiv = h('span')
   nameDiv.textContent = id.substring(0, 10) + '...'
   logs.query(id).then(querylog => {
-    querylog.forEach(msg => {
-      if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
-        find(msg.text.substring(5,49)).then(data => {
-          if (data) {
-            nameDiv.textContent = data
-            kv.set('name:' + id, data)
-          }
-        })
-      }
-    })
+    if (querylog[0]) {
+      querylog.forEach(msg => {
+        if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
+          find(msg.text.substring(5,49)).then(data => {
+            if (data) {
+              nameDiv.textContent = data
+              kv.set('name:' + id, data)
+            }
+          })
+        }
+      })
+    }
   })
   //logs.getLog().then(log => {
   //  if (log[0]) {
