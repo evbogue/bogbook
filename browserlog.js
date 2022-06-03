@@ -68,7 +68,7 @@ export const logs = function logs (query) {
     query: async function (query) {
       if (log[0]) {
         if (query.startsWith('?')) {
-          const querylog = arraystore.filter(msg => msg.text.includes(query.substring(1)))
+          const querylog = arraystore.filter(msg => msg.text && msg.text.includes(query.substring(1)))
           return querylog 
         } else {
           const querylog = arraystore.filter(msg => msg.author == query || msg.hash == query)
