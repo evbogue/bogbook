@@ -15,7 +15,7 @@ export function getImage (id) {
 
   logs.query(id).then(querylog => {
     querylog.forEach(msg => {
-      if (msg.text.startsWith('image:') && msg.text.substring(50) === id) {
+      if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
         find(msg.text.substring(6,50)).then(data => {
           if (data) {
             img.src = data
@@ -52,7 +52,7 @@ export function getName (id) {
   nameDiv.textContent = id.substring(0, 10) + '...'
   logs.query(id).then(querylog => {
     querylog.forEach(msg => {
-      if (msg.text.startsWith('name:') && msg.text.substring(49) === id) {
+      if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
         find(msg.text.substring(5,49)).then(data => {
           if (data) {
             nameDiv.textContent = data
