@@ -71,7 +71,7 @@ export function query (scroller, src) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
   logs.query(src).then(log => {
-    if (log[0]) {
+    if (log && log[0]) {
       adder(log, src, scroller)
     } else {
       blast(src)

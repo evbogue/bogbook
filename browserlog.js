@@ -52,7 +52,7 @@ setInterval(function () {
 export const logs = function logs (query) {
   return {
     getLatest: async function (author) {
-      if (log[0]) {
+      if (arraystore[0]) {
         const querylog = arraystore.filter(msg => msg.author == author)
         if (querylog[0]) {
           //console.log(querylog[querylog.length -1])
@@ -66,7 +66,7 @@ export const logs = function logs (query) {
       return arraystore
     },
     query: async function (query) {
-      if (log[0]) {
+      if (arraystore[0]) {
         if (query.startsWith('?')) {
           const querylog = arraystore.filter(msg => msg.text && msg.text.includes(query.substring(1)))
           return querylog 

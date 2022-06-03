@@ -44,7 +44,7 @@ function replicate (ws) {
   if (src.length === 44) {
     //console.log(src)
     logs.query(src).then(query => {
-      if (!query.length && !blastcache.includes(src)) {
+      if (!query && !blastcache.includes(src)) {
         //console.log('we do not have it')
         blastcache.push(src)
         ws.send(src)  
