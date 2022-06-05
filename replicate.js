@@ -8,11 +8,17 @@ import { encode } from './lib/base64.js'
 const peers = new Map()
 
 let blastcache = []
+let times = 0
 
 setTimeout(function () {
   blastcache.forEach(value => {
     blast(value)
   })
+  times++
+  if (times > 5) {
+    blastcache = []
+    times = 0
+  }
 }, 10000)
 
 export function blast (msg) {
