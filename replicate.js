@@ -13,7 +13,6 @@ setTimeout(function () {
   blastcache.forEach(value => {
     blast(value)
   })
-  blastcache = []
 }, 10000)
 
 export function blast (msg) {
