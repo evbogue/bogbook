@@ -9,11 +9,12 @@ const blobstore = new Map()
 const arraystore = []
 
 var blastcache = []
+let times = 0
 
 setTimeout(function () {
   blastcache = []
   arraystore.sort((a,b) => a.timestamp - b.timestamp)  
-}, 10000)
+}, 1000)
 
 //let newData = false
 
