@@ -72,6 +72,9 @@ function replicate (ws) {
           //}
           if (i === 0 && feeds[0]) {
             feeds.forEach(feed => {
+              logs.getLatest(feed).then(latest => {
+                ws.send(latest)
+              })
               //console.log(feed)
               ws.send(feed)
             })
