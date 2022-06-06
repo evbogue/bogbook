@@ -4,17 +4,9 @@ import { open } from './sbog.js'
 
 async function addPosts (posts, div) {
   posts.forEach(msg => {
-    const getMsg = document.getElementById(msg.hash)
-    if (!getMsg) {
-      render(msg).then(rendered => {
-        div.appendChild(rendered)
-      })
-      //logs.get(msg.substring(57, 101)).then(got => {
-      //  render(got).then(rendered => {
-      //    div.appendChild(rendered)
-      //  })
-      //})
-    }
+    render(msg).then(rendered => {
+      div.appendChild(rendered)
+    })
   })
 }
 
@@ -27,6 +19,7 @@ export function adder (log, src, div) {
     addPosts(posts, div).then(done => {
       index = index + 25
       window.onscroll = function (ev) {
+        console.log(src)
         if (
           ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 1000)
           && window.location.hash.substring(1) === src
