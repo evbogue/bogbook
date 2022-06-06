@@ -9,12 +9,11 @@ const blobstore = new Map()
 const arraystore = []
 
 var blastcache = []
-let times = 0
 
-setTimeout(function () {
+setInterval(function () {
   blastcache = []
   arraystore.sort((a,b) => a.timestamp - b.timestamp)  
-}, 1000)
+}, 10000)
 
 //let newData = false
 
@@ -22,22 +21,11 @@ async function getLatest (author) {
   if (arraystore[0]) {
     const querylog = arraystore.filter(msg => msg.author == author)
     if (querylog[0]) {
+      //console.log(author + '\'s latest post is ' + querylog[querylog.length -1].hash)
       return querylog[querylog.length -1]
     } else { return undefined }
   } else { return undefined}
 }
-//async function getLatest (author) {
-//  if (log[0]) {
-//    for (let i = log.length -1; i >= 0 ; i--) {
-//      if (log[i].substring(13, 57) === author) {
-//        return log[i].substring(57, 101)
-//      }
-//      if (i === 0) {
-//        return undefined
-//      }
-//    }
-//  } else { return undefined }
-//}
 
 function processReq (req, ws) {
   //console.log(req)

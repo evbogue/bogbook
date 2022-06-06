@@ -20,15 +20,6 @@ function genkey (brute) {
         stop.parentNode.replaceChild(button, stop)
       }
 
-      //if ((brute.length == 1) && keygen.startsWith(brute.substring(0, 1))) {
-      //  clearInterval(interval)
-      //  stop.parentNode.replaceChild(button, stop)
-
-      //}
-      //else if (brute && keygen.startsWith(brute.substring(0, 2))) {
-      //  clearInterval(interval)
-      //  stop.parentNode.replaceChild(button, stop)
-      //}
       const keymessage = h('div', {classList:'message'}, [
         h('div', [getImage(keygen.substring(0, 44)), ' ', getName(keygen.substring(0, 44))]),
         h('div', [keygen]),

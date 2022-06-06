@@ -117,7 +117,6 @@ export async function render (msg) {
         })
       }
     })
-    //adder(log, src, replyDiv)
   })
 
   return messageDiv
