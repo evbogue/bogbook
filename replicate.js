@@ -157,35 +157,35 @@ function processReq (req, ws) {
             } if (!got) {
               //console.log('we do not have it, add to db')
               logs.add(req)
-              if (opened.previous != opened.hash) { 
-                ws.send(opened.previous)
-              }
-              const scroller = document.getElementById('scroller')
-              render(opened).then(rendered => {
-                scroller.insertBefore(rendered, scroller.childNodes[1])
-                //scroller.appendChild(rendered)
-              })           
+              //if (opened.previous != opened.hash) { 
+              //  ws.send(opened.previous)
+              //}
+              const getMsg = document.getElementById(opened.hash)
+              if (!getMsg) {
+                const scroller = document.getElementById('scroller')
+                render(opened).then(rendered => {
+                  // check if a message already has this as previous, then see if we can find that message on the screen and insert the message underneath it. If we cannot find the message on the screen, then append at the bottom of the scroller. If we do not have a message that contains the previous then we put it at the top because it should be new.
+                  logs.getNext(opened.hash).then(next => {
+                    console.log('NEXT: ' + next)
+                    if (!next) {
+                      scroller.insertBefore(rendered, scroller.childNodes[1])
+                    } else {
+                      const getNext = document.getElementById(opened.hash)
+                      if (!getNext) {
+                        scroller.appendChild(rendered)
+                      } 
+                      if (getNext) {
+                        getNext.appendChild(rendered)
+                      }
+                    }
+                  })
+                })
+              }           
             }
           })
         }
       })
     }
-      //if (opened && !store.has(opened.hash)) {
-      //  log.unshift(req)
-      //  store.set(opened.hash, opened)
-      //  console.log('added ' + opened.hash + ' by ' + opened.author)
-      //  // then we need to make sure we have the data associated with the post
-      //  if (!store.has(opened.data)) {
-      //    //ws.send(opened.data)
-      //  }
-      //  if (!store.has(opened.previous)) {
-      //    console.log('requesting ' + opened.previous)
-      //    ws.send(opened.previous)
-      //  }
-      //}
-      //if (!opened && !store.has(opened.hash)) {
-      //  console.log('maybe this is a data blob?')
-      //}
   }
 }
 
@@ -197,7 +197,7 @@ export function connect (server) {
   ws.binaryType = 'arraybuffer'
 
   ws.onopen = () => {
-    //ws.send(keys.pubkey())
+    ws.send('connect:' + keys.pubkey())
     peers.set(id, ws)
     //setTimeout(function () {
       replicate(ws)
