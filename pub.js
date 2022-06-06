@@ -122,7 +122,11 @@ export async function servePub (e) {
   }
 
   ws.onmessage = (e) => {
-    processReq(e.data, ws)
+    if (e.data.startsWith('connect:')) {
+      console.log(e.data)
+    } else {
+      processReq(e.data, ws)
+    }
   }
 
   ws.onclose = function () {
