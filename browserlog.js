@@ -61,6 +61,14 @@ export const logs = function logs (query) {
         }
       }
     },
+    getNext: async function (hash) {
+      if (arraystore[0]) {
+        const findNext = arraystore.filter(msg => msg.previous == hash)
+        if (findNext[0]) {
+          return findNext[0].hash
+        } else return undefined
+      }
+    },
     get: async function (hash) {
       const msgarray = arraystore.filter(msg => msg.hash == hash)
       if (msgarray[0]) {
