@@ -7,6 +7,7 @@ import { keys } from './browserkeys.js'
 import { logs } from './browserlog.js'
 import { adder } from './adder.js'
 import { find } from './inpfs.js'
+import { blast } from './replicate.js'
 
 export async function render (msg) {
 
@@ -117,6 +118,12 @@ export async function render (msg) {
         })
       }
     })
+  })
+
+  logs.get(msg.previous).then(gotit => {
+    if (!gotit) {
+      blast(msg.previous)
+    }
   })
 
   return messageDiv
