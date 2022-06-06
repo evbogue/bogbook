@@ -11,15 +11,12 @@ import { find } from './inpfs.js'
 export async function render (msg) {
 
   const src = msg.hash
-  const messageDiv = h('div', {id: src})
   const message = h('div', {classList: 'message'})
-  messageDiv.appendChild(message)
+  const messageDiv = h('div', {id: src}, [message])
 
   const timestamp = h('a', {href: '#' + src}, [human(new Date(msg.timestamp))])
 
-  setInterval(function () {
-    timestamp.textContent = human(new Date(msg.timestamp))
-  }, 10000)
+  setInterval(function () {timestamp.textContent = human(new Date(msg.timestamp))}, 10000)
 
   const merklenav = h('code')
 
@@ -27,7 +24,8 @@ export async function render (msg) {
     merklenav.appendChild(h('a', {href: '#' + msg.previous}, ['prev']))
   } else {
     merklenav.appendChild(h('code', ['root']))
-  } 
+  }
+ 
   message.appendChild(h('span', {classList: 'right'}, [
     h('code', [msg.author.substring(0, 7)]),
     ' ',
@@ -54,98 +52,55 @@ export async function render (msg) {
     }
   }}, ['Reply'])
 
-  function contentRender(data, message) {
+  function contentRender(data, content) {
     if (data.startsWith('image:')) {
-      console.log(data)
       const named = data.substring(50)
       find(data.substring(6, 50)).then(file => {
         if (file) {
-          const content = h('span', [
+          const span = h('span', [
             ' imaged ',
             h('a', {href: '#' + named}, [h('img', {classList: 'avatar', src: file})])
           ])
-          message.appendChild(content)
+          content.appendChild(span)
         }
       })
-    } 
-    else if (data.startsWith('name:')) {
+    } else if (data.startsWith('name:')) {
       const named = data.substring(49)
       find(data.substring(5, 49)).then(file => {
         if (file) {
-          const content = h('span', [
+          const span = h('span', [
             ' named ',
             h('a', {href: '#' + named}, [file])
           ])
-          message.appendChild(content)
+          content.appendChild(span)
         } 
       }) 
-    } else if (data) {
-      const content = h('div', {innerHTML: markdown(data)})
-      setTimeout(function () {
-        content.innerHTML = markdown(data)
-      }, 1000)
-      message.appendChild(content)
-      message.appendChild(reply)
+    } else {
+      content.innerHTML = markdown(data)
     }
   }
 
-  find(msg.data).then(data => {
-    if (data) {
-      contentRender(data, message)
-    } 
-    if (!data) {
-      // do this in inpfs module blast(msg.data)
-      setTimeout(function () {
-        find(msg.data).then(data => {
-          if (data) {
-            contentRender(data, message)
-          }
-          if (!data) {
-            message.appendChild(h('div', ['Not Found.']))
-          }
-        })
-      }, 1000)
-    }
-  })
+  const content = h('div')
 
-  //if (msg.text) {
-  //  const content = h('div', {innerHTML: markdown(msg.text)})
-  //  setTimeout(function () {
-  //    content.innerHTML = markdown(msg.text)
-  //  }, 1000)
-  //  message.appendChild(content)
-  //  message.appendChild(reply)
-  //}
+  let retries = 0
+  
+  function getData (hash, content) {
+    find(hash).then(data => {
+      if (data) {
+        contentRender(data, content)
+      } else if (retries < 50) {
+        retries++
+        setTimeout(function () {
+          getData(hash, content)
+        }, 1000 * retries)
+      }
+    })
+  }
 
-  //if (msg.name) {
-  //  const content = h('span', [
-  //    ' named ', 
-  //    h('a', {href: '#' + msg.named}, [msg.name])
-  //  ])
-  //  message.appendChild(content)
-  //}
+  getData(msg.data, content)
 
-  //if (msg.image) {
-  //  const img = h('img', {classList: 'thumb'})
-  //  const link = h('a', { href: '#' + msg.imaged}, [getName(msg.imaged)])
-  //  const content = h('span', [
-  //    ' posted an image of ',
-  //    link, 
-  //    ' '
-  //  ])
-  //  const image = cache.get(msg.image)
-  //  if (image) {
-  //    content.appendChild(h('img', {classList: 'avatar', src: image}))
-  //  } else {
-  //    setTimeout(function () {
-  //      const retry = cache.get(msg.image)
-  //      if (retry) {
-  //        content.appendChild(h('img', {classList: 'avatar', src: retry}))
-  //      }
-  //    }, 1000)
-  //  }
-  //  message.appendChild(content) 
-  //}
+  message.appendChild(content)
+  message.appendChild(reply)
 
   const replyDiv = h('div', {classList: 'indent'})
 
