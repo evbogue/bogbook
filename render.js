@@ -54,6 +54,7 @@ export async function render (msg) {
 
   function contentRender(data, content) {
     if (data.startsWith('image:')) {
+      content.innerHTML = ''
       const named = data.substring(50)
       find(data.substring(6, 50)).then(file => {
         if (file) {
@@ -65,6 +66,7 @@ export async function render (msg) {
         }
       })
     } else if (data.startsWith('name:')) {
+      content.innerHTML = ''
       const named = data.substring(49)
       find(data.substring(5, 49)).then(file => {
         if (file) {
