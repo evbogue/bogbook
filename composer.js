@@ -81,7 +81,6 @@ function photoAdder (textarea, preview) {
 }
 
 export function composer (msg) {
-  console.log(msg)
   let preview = h('div')
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
@@ -102,7 +101,6 @@ export function composer (msg) {
 
   textarea.addEventListener('input', function (e) {
     if (textarea.value) {
-      console.log(textarea.value)
       kv.set('draft:' + msg.hash, textarea.value)
     } else {
       kv.remove('draft:' + msg.hash)
