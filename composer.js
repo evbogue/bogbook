@@ -92,9 +92,9 @@ export function composer (msg) {
         name = msg.author.substring(0, 10) + '...'
       }
       if (msg.author === msg.hash) {
-        textarea.value = '[' + name + '](' + msg.author + ')'
+        textarea.value = '[' + name + '](' + msg.author + ') \n\n'
       } else {
-        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ')'
+        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') \n\n'
       }
     })
   }
