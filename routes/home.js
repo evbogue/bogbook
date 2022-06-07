@@ -10,7 +10,7 @@ export function home (scroller) {
   const composemsg = h('div', {classList: 'message'}, [
     h('span', {classList: 'right'}, ['Preview']),
     getBoth(keys.pubkey()),
-    composer()
+    composer({hash: 'home'})
   ])
 
   scroller.appendChild(composemsg)

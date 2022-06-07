@@ -85,38 +85,30 @@ export function composer (msg) {
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
-  let src
-
-  if (msg) {
-    src = msg.raw.substring(57, 101)
-  } else {
-    src = 'home'
-  }
-
-  if (src.length === 44) {
+  if (msg.hash.length === 44) {
     kv.get('name:' + msg.author).then(name => {
       var select = window.getSelection().toString()
       if (!name) {
         name = msg.author.substring(0, 10) + '...'
       }
-      if (msg.author === src) {
+      if (msg.author === msg.hash) {
         textarea.value = '[' + name + '](' + msg.author + ')'
       } else {
-        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || src.substring(0, 7)) + '](' + src + ')'
+        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ')'
       }
     })
   }
 
   textarea.addEventListener('input', function (e) {
     if (textarea.value) {
-      kv.set('draft:' + src, textarea.value)
+      kv.set('draft:' + msg.hash, textarea.value)
     } else {
-      kv.remove('draft' + src)
+      kv.remove('draft' + msg.hash)
     }
     preview.innerHTML = markdown(textarea.value)
   })
 
-  kv.get('draft:' +  src).then(got => {
+  kv.get('draft:' +  msg.hash).then(got => {
     if (got) {
       textarea.value = got
       preview.innerHTML = markdown(textarea.value)
@@ -132,7 +124,7 @@ export function composer (msg) {
         publish(textarea.value).then(msg => {
           open(msg).then(opened => {
             render(opened).then(rendered => {
-              const getMsg = document.getElementById(src)
+              const getMsg = document.getElementById(msg.hash)
               if (getMsg) {
                 compose.parentNode.parentNode.removeChild(compose.parentNode)
                 getMsg.appendChild(h('div', {classList: 'indent'}, [rendered]))
@@ -141,7 +133,7 @@ export function composer (msg) {
               }
               preview.innerHTML = ''
               textarea.value = ''
-              kv.remove('draft:' + src)
+              kv.remove('draft:' + msg.hash)
               save()
             }) 
           })
@@ -158,7 +150,7 @@ export function composer (msg) {
     //getContacts(textarea, preview)
   ])
 
-  if (src != 'home') {
+  if (!(msg.hash === 'home' || msg.hash === msg.author)) {
     const cancelButton = h('button', {onclick: function () {
       compose.parentNode.parentNode.removeChild(compose.parentNode)
     }}, ['Cancel'])

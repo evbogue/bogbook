@@ -7,6 +7,7 @@ import { make } from './../inpfs.js'
 import { publish, open } from './../sbog.js'
 import { render } from './../render.js'
 import { blast } from './../replicate.js'
+import { composer } from './../composer.js'
 
 function photoAdder (src, div) {
   const uploadButton = h('button', {onclick: function () {
@@ -67,6 +68,7 @@ export function query (scroller, src) {
     header.appendChild(h('span', [getBoth(src)]))
     header.appendChild(nameDiv)
     header.appendChild(photoAdder(src, messageDiv))
+    header.appendChild(composer({author: src, hash: src}))
   } else if (src.startsWith('?')) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
