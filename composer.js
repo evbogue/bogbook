@@ -81,6 +81,7 @@ function photoAdder (textarea, preview) {
 }
 
 export function composer (msg) {
+  console.log(msg)
   let preview = h('div')
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
@@ -92,24 +93,26 @@ export function composer (msg) {
         name = msg.author.substring(0, 10) + '...'
       }
       if (msg.author === msg.hash) {
-        textarea.value = '[' + name + '](' + msg.author + ') \n\n'
+        textarea.value = '[' + name + '](' + msg.author + ') '
       } else {
-        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') \n\n'
+        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') '
       }
     })
   }
 
   textarea.addEventListener('input', function (e) {
     if (textarea.value) {
+      console.log(textarea.value)
       kv.set('draft:' + msg.hash, textarea.value)
     } else {
-      kv.remove('draft' + msg.hash)
+      kv.remove('draft:' + msg.hash)
     }
     preview.innerHTML = markdown(textarea.value)
   })
 
-  kv.get('draft:' +  msg.hash).then(got => {
+  kv.get('draft:' + msg.hash).then(got => {
     if (got) {
+      console.log(got)
       textarea.value = got
       preview.innerHTML = markdown(textarea.value)
       setTimeout(function () {

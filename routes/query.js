@@ -10,7 +10,7 @@ import { blast } from './../replicate.js'
 import { composer } from './../composer.js'
 
 function photoAdder (src, div) {
-  const uploadButton = h('button', {onclick: function () {
+  const uploadButton = h('button', {title: 'New photo', onclick: function () {
     input.click()
   }}, ['📸  '])
 
@@ -55,9 +55,16 @@ export function query (scroller, src) {
   messageDiv.appendChild(header)
 
   const nameDiv = h('span', [
-    h('button', {onclick: function () {
+    h('button', {title: 'New name',  onclick: function () {
       header.appendChild(newName(src, messageDiv))
       nameDiv.parentNode.removeChild(nameDiv)
+    }}, ['🏷️'])
+  ])
+
+  const composeDiv = h('span', [
+    h('button', {title: 'New reply', onclick: function () {
+      header.appendChild(composer({author: src, hash: src}))
+      composeDiv.parentNode.removeChild(composeDiv)
     }}, ['📝'])
   ])
 
@@ -65,10 +72,10 @@ export function query (scroller, src) {
     if (src === keys.pubkey()) {
       header.appendChild(h('span', {classList: 'right'}, ['This is you.']))
     }
-    header.appendChild(h('span', [getBoth(src)]))
+    header.appendChild(h('span', [getBoth(src), ' ']))
+    header.appendChild(composeDiv)
     header.appendChild(nameDiv)
     header.appendChild(photoAdder(src, messageDiv))
-    header.appendChild(composer({author: src, hash: src}))
   } else if (src.startsWith('?')) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
