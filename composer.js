@@ -81,6 +81,7 @@ function photoAdder (textarea, preview) {
 }
 
 export function composer (msg) {
+  console.log(msg)
   let preview = h('div')
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
@@ -122,8 +123,8 @@ export function composer (msg) {
   const publishButton = h('button', {
     onclick: function () {
       if (textarea.value) {
-        publish(textarea.value).then(msg => {
-          open(msg).then(opened => {
+        publish(textarea.value).then(published => {
+          open(published).then(opened => {
             render(opened).then(rendered => {
               const getMsg = document.getElementById(msg.hash)
               if (getMsg) {
