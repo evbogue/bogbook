@@ -10,7 +10,8 @@ export function navbar (screen) {
     ' ',
     h('a', {href: '#'}, ['Home']),
     ' ',
-    h('a', {href: '#key'}, ['Key'])
+    h('a', {href: '#key'}, ['Key']),
+    h('a', {href: 'https://git.sr.ht/~ev/bogbookv3', classList: 'right'}, ['Git'])
   ])
   navbar.appendChild(internal)
 }
