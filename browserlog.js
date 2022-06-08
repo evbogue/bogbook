@@ -21,7 +21,7 @@ kv.get('log', function (err, file) {
         }
       })
     })
-    arraystore.sort((a,b) => a.timestamp - b.timestamp)
+    //arraystore.sort((a,b) => a.timestamp - b.timestamp)
   }
 })
 
@@ -29,7 +29,7 @@ let newData = true
 
 setInterval(function () {
   if (newData) {
-    arraystore.sort((a,b) => a.timestamp - b.timestamp)
+    //arraystore.sort((a,b) => a.timestamp - b.timestamp)
     kv.set(log, log)
     newData = false
   }
@@ -40,6 +40,8 @@ export const logs = function logs (query) {
     getLatest: async function (author) {
       if (arraystore[0]) {
         const querylog = arraystore.filter(msg => msg.author == author)
+        querylog.sort((a,b) => a.timestamp - b.timestamp)
+
         if (querylog[0]) {
           return querylog[querylog.length -1].hash
         } else {
@@ -48,21 +50,25 @@ export const logs = function logs (query) {
       } else { return undefined }
     },
     getLog: async function () {
+      arraystore.sort((a,b) => a.timestamp - b.timestamp)
       return arraystore
     },
     query: async function (query) {
       if (arraystore[0]) {
         if (query.startsWith('?')) {
           const querylog = arraystore.filter(msg => msg.text && msg.text.includes(query.substring(1)))
+          querylog.sort((a,b) => a.timestamp - b.timestamp)
           return querylog 
         } else {
           const querylog = arraystore.filter(msg => msg.author == query || msg.hash == query)
+          querylog.sort((a,b) => a.timestamp - b.timestamp)
           return querylog 
         }
       }
     },
     getNext: async function (hash) {
       if (arraystore[0]) {
+        arraystore.sort((a,b) => a.timestamp - b.timestamp)
         const findNext = arraystore.filter(msg => msg.previous == hash)
         if (findNext[0]) {
           return findNext[0].hash
