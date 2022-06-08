@@ -1,34 +1,51 @@
-# Bogbook v3 (a merkle tree grows in the bogusphere)
+# Bogbook
 
-Ok, so append only logs are annoying because they take forever to sync. And keeping data on the log is the problem, so let's consider another way to do these things.
+### A replicated and secure social network made from ed25519 hash chains
 
-We need to have a block of signed hashes ordered by timestamp that is available on a server in the form of an timestamp sorted array.
+This is my third attempt at making a distributed social network, the big difference between Bogbook v3 and Bogbook v2 is that I stopped using append-only logs, and now we are using a hash chain with no sequence order. 
+
+### How it works
+
+When you publish a new post it references the sha256 hash of the previous post. If this is your first post then the hash of the post and the previous hash will be identical, and that is called a "root" post. The replication algorithm will stop trying to sync posts when it reaches the root.
+
+Posts are created in the browser client, and then replicated onto "pub" servers. You can request the latest post from an author by sending the author's ed25519 public key to the server, the server will find the latest post from the author and then send it to you. 
+
+Once you get the latest post from the author the replication algorithm asks for the hash of the previous post until you reach a post that you already have, then it will stop asking for previous posts and your copy of the feed is up to date. 
+
+You sync from the latest post backwards, and thus you do not have to wait until an entire feed syncs before interacting on the network.
+
+You can fork a feed by using two devices. To merge the feed, you will want to mention your fork in the text of a new message so that people can find the head of that branch and sync backwards until the fork is resolved. The algorithm itself does not fix forked feeds, but it won't break if there is a fork. 
+
+### The Protocol
+
+Messages are sent around using this protocol format:
 
 ```
-<ts><pubkey><hash><previous><datahash><sig>
+<ed25519 Public Key><Signature>
 ```
 
-and the hash is a hash of 
+which opens to a string that contains
 
 ```
-<ts><pubkey><datahash>
+<timestamp><ed25519 Public Key><Previous Post Hash><Data Hash><Post Hash>
 ```
 
-the sig is equal to 
+And from that we create a message object:
 
 ```
-<ts><pubkey><hash><previous><datahash>
+{
+  timestamp: <timestamp>,
+  author: <ed25519 Public Key>,
+  previous: <sha256 hash from previous post>,
+  data: <sha256 hash of post data>,
+  hash: <sha256 hash of post (ts, author, data)>,
+  raw: <timestamp><ed25519 Public Key><Previous Post Hash><Data Hash><Post Hash>
+}
 ```
 
-And we only open it to confirm the block hasn't been modified
+This means we are not signing a JSON.stringified object, which should make it easier to port this to other programming languages.
 
-Next we fetch the hash to retrieve the data. If we can't find the hash, then we keep trying servers until we find it or we simply give up.
 
-When we fetch the data we make sure that the hash is valid.
-
-Bonus, we are staying away from JSON objects so no one runs into trouble implementing the signature structure if anyone ports this to another language someday.
-
-Perhaps this is a merkle tree and we can consider the leaf nodes the data associated with the hashes? Someone can think about it and let me know if it is, or if this is somehow a different abstraction.
 
 ---
 MIT

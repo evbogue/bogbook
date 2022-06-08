@@ -4,7 +4,7 @@ import { encode } from './lib/base64.js'
 import { getImage, getName } from './avatar.js'
 import { keyroute } from './routes/key.js'
 
-const kv = new IdbKvStore('merklebog')
+const kv = new IdbKvStore('bogbook3')
 
 export const welcome = h('div', {id: 'scroller'})
 
@@ -13,7 +13,6 @@ function genkey (brute) {
   while (keygen.includes('/')) {
     const genkey = nacl.sign.keyPair()
     keygen = encode(genkey.publicKey) + encode(genkey.secretKey)
-    console.log(keygen.length)
     if (!keygen.includes('/')) {
       if ((brute.length) && keygen.startsWith(brute.substring(0, 1))) {
         clearInterval(interval)

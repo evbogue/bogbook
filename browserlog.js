@@ -1,7 +1,7 @@
 import { open } from './sbog.js'
 import { blast } from './replicate.js'
 
-const kv = new IdbKvStore('merklebog')
+const kv = new IdbKvStore('bogbook3')
 
 const arraystore = []
 

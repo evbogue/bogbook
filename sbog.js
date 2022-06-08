@@ -10,7 +10,7 @@ export async function publish (data) {
 
   const timestamp = Date.now()
 
-  let msg = timestamp + keys.pubkey() + datahash
+  const msg = timestamp + keys.pubkey() + datahash
 
   const hash = encode(sha256(new TextEncoder().encode(msg)))
 
@@ -20,30 +20,30 @@ export async function publish (data) {
     previous = hash
   }
 
-  msg = timestamp + keys.pubkey() + hash + previous + datahash
+  const next = msg + previous + hash
   
-  const sig = encode(nacl.sign(new TextEncoder().encode(msg), decode(keys.privkey())))
+  const sig = encode(nacl.sign(new TextEncoder().encode(next), decode(keys.privkey())))
 
-  msg = msg + sig
-  logs.add(msg)
-  return msg
+  const done = keys.pubkey() + sig
+  logs.add(done)
+  return done
 }
 
 export async function open (msg) {
-  const obj = {}
-  obj.timestamp = parseInt(msg.substring(0, 13))
-  obj.author = msg.substring(13, 57)
-  obj.hash = msg.substring(57, 101)
-  obj.previous = msg.substring(101, 145)
-  obj.data = msg.substring(145, 189)
-  obj.text = await find(obj.data)
-  //should be at render? obj.text = await find(obj.data)
-  obj.raw = msg
+  const opened = new TextDecoder().decode(nacl.sign.open(decode(msg.substring(44)), decode(msg.substring(0, 44))))
 
-  const opened = new TextDecoder().decode(nacl.sign.open(decode(msg.substring(189)), decode(obj.author)))
-
-  if (opened === msg.substring(0, 189)) {
-    return obj
+  const obj = {
+    timestamp: parseInt(opened.substring(0, 13)),
+    author: opened.substring(13, 57),
+    hash : opened.substring(145),
+    previous: opened.substring(101, 145),
+    data: opened.substring(57, 101),
+    raw: msg
   }
+
+  //should be at render? obj.text = await find(obj.data)
+  obj.text = await find(obj.data)
+
+  return obj
 }
 

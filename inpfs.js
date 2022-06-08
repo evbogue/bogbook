@@ -10,6 +10,7 @@ export async function make (file) {
   //and then we save the inpfs file using the inpns filename in the browser's IndexedDb for easy access
   kv.set(hash, file)
   blast('blob:' + hash+file)
+  console.log(hash)
   return hash
 }
 

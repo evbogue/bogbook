@@ -6,7 +6,7 @@ import { render } from './render.js'
 import { logs, save } from './browserlog.js'
 import { make, find } from './inpfs.js'
 
-const kv = new IdbKvStore('merklebog')
+const kv = new IdbKvStore('bogbook3')
 
 export function getImage (id) {
   let img = vb(decode(id), 256)

@@ -6,7 +6,7 @@ import { save, logs } from './browserlog.js'
 import { render } from './render.js'
 import { getName, getImage } from './avatar.js'
 
-const kv = new IdbKvStore('merklebog')
+const kv = new IdbKvStore('bogbookv3')
 
 //function getContacts (textarea, preview) {
 //  const feeds = logs.getFeeds()
@@ -81,7 +81,6 @@ function photoAdder (textarea, preview) {
 }
 
 export function composer (msg) {
-  console.log(msg)
   let preview = h('div')
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
