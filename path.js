@@ -1,4 +1,4 @@
-import {ensureDir} from 'https://deno.land/std@0.129.0/fs/mod.ts'
+import {ensureDir} from 'https://deno.land/std@0.143.0/fs/mod.ts'
 
 export const path = function () {
   const appdir = Deno.args[0] || 'ssbogs'

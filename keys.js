@@ -1,7 +1,7 @@
 import nacl from './lib/nacl-fast-es.js'
 import { path } from './path.js'
 import { decode, encode } from './lib/base64.js'
-import { ensureFileSync } from 'https://deno.land/std@0.129.0/fs/mod.ts'
+import { ensureFileSync } from 'https://deno.land/std@0.143.0/fs/mod.ts'
 
 export const keys = function () {
   const keypath = path.root() + 'keypair'

@@ -1,5 +1,5 @@
 import { open } from './sbog.js'
-import { ensureDir, exists } from 'https://deno.land/std@0.129.0/fs/mod.ts'
+import { ensureDir, exists } from 'https://deno.land/std@0.143.0/fs/mod.ts'
 
 if (await exists(path + 'log')) {
   log = JSON.parse(await Deno.readTextFile(path + 'log'))
