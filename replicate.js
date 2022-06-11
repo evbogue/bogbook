@@ -67,18 +67,28 @@ function replicate (ws) {
           if (!feeds.includes(log[i].author)) {
             feeds.push(log[i].author)
           }
-          //if (!feeds.includes(log[i].substring(13, 57))) {
-          //  feeds.push(log[i].substring(13, 57))
-          //}
           if (i === 0 && feeds[0]) {
             feeds.forEach(feed => {
               logs.getLatest(feed).then(latest => {
-                ws.send(latest)
+                ws.send(latest.hash)
               })
               //console.log(feed)
               ws.send(feed)
             })
           }
+          //src = window.location.hash.substring(1)
+          //console.log(src)
+          //if (src.length === 44) {
+          //  if (!feeds.includes(src)) {
+          //    logs.get(src).then(got => {
+          //      console.log(got)
+          //      if (!got && ) {
+          //        console.log(' asking for src we do not have it')
+          //        ws.send(src)
+          //      }
+          //    })
+          //  }
+          //}
         }
       })
     }, 10000)
@@ -108,7 +118,7 @@ function processReq (req, ws) {
         logs.get(latest).then(got => {
           if (got) {
             gotit = true
-            ws.send(got.raw)
+            ws.send(got.hash)
           }
         })
       } else {

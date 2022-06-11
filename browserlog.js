@@ -37,11 +37,10 @@ setInterval(function () {
 
 export const logs = function logs (query) {
   return {
-    getLatest: async function (author) {
+    getLatest: async function (query) {
       if (arraystore[0]) {
-        const querylog = arraystore.filter(msg => msg.author == author)
+        const querylog = arraystore.filter(msg => msg.author == query)
         querylog.sort((a,b) => a.timestamp - b.timestamp)
-
         if (querylog[0]) {
           return querylog[querylog.length -1].hash
         } else {
@@ -68,7 +67,6 @@ export const logs = function logs (query) {
     },
     getNext: async function (hash) {
       if (arraystore[0]) {
-        arraystore.sort((a,b) => a.timestamp - b.timestamp)
         const findNext = arraystore.filter(msg => msg.previous == hash)
         if (findNext[0]) {
           return findNext[0].hash

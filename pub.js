@@ -1,82 +1,72 @@
 import { keys } from './keys.js'
 import { open } from './denobog.js'
 import { encode } from './lib/base64.js'
+import { logs } from './log.js'
+import { path } from './path.js'
 
 const sockets = new Set()
 
 const blobstore = new Map()
 
-const arraystore = []
-
 var blastcache = []
+
+let newData = false
 
 setInterval(function () {
   blastcache = []
-  arraystore.sort((a,b) => a.timestamp - b.timestamp)  
 }, 10000)
 
-//let newData = false
-
-async function getLatest (author) {
-  if (arraystore[0]) {
-    const querylog = arraystore.filter(msg => msg.author == author)
-    if (querylog[0]) {
-      //console.log(author + '\'s latest post is ' + querylog[querylog.length -1].hash)
-      return querylog[querylog.length -1]
-    } else { return undefined }
-  } else { return undefined}
-}
-
 function processReq (req, ws) {
-  //console.log(req)
   if (req.length === 44) {
-    if (!arraystore[0]) { 
-      //console.log('no log yet, sending req back hoping for a message')
-      ws.send(req)
-    } else if (blobstore.has(req)) {
-      const file = blobstore.get(req)
-      if (!(typeof(file) === 'object') && file.substring(0, 5) === 'blob:') {
-        //console.log('this is a blob')
-        ws.send('blob:' + req + file.substring(5))
-      } //else {
-        //console.log('we have the post ' + req + ' sending it')
-        //ws.send(file.raw)
-      //}
-    } else if (!blobstore.has(req)) {
-      // first check for the post
-      const msgarray = arraystore.filter(msg => msg.hash == req)
-      if (msgarray[0]) {
-        //console.log('we have the post ' + req + ' sending it')
-        ws.send(msgarray[0].raw)
-      } else {
-        // then check to see if it is an author
+    let sent = false
+    logs.getLog(req).then(log => {
+      if (!log[0]) { 
+        ws.send(req)
+        sent = true
       }
-      //console.log('checking if ' + req + ' is an author pubkey')
-      getLatest(req).then(latest => {
-        if (latest) {
-          //console.log('yes it is a pubkey, sending: ' + latest.hash)
-          ws.send(latest.raw)
-        } if (!latest) {
-          //console.log('we do not have it asking for' + req )
-          ws.send(req)
-          blastcache.push(req)
-        }
+    })
+    Deno.stat(path.blobs() + req.replaceAll('/', ':'))
+      .then(exists => {
+        const file = Deno.readTextFileSync(path.blobs() + req.replaceAll('/', ':'))
+        blobstore.set(file)
+        ws.send('blob:' + req + file)
+        sent = true
       })
-    }
+      .catch(err => {
+        if (blobstore.get(req)) {
+          ws.send('blob:' + req + file)
+          sent = true
+        } 
+      })
+    logs.get(req).then(msg => {
+      if (msg) {
+        ws.send(msg.raw)
+        sent = true
+      }
+    })
+    logs.getLatest(req).then(latest => {
+      if (latest) {
+        ws.send(latest.hash)
+        sent = true
+      } 
+    })
+    setTimeout(function () {
+      if (!sent) {
+        ws.send(req)
+        blastcache.push(req)
+      }
+    })
   } 
   if (req.length > 44) {
     if (req.startsWith('blob:')) {
-      //console.log('this is a blob')
       const hash = req.substring(5, 49)
-      //console.log(hash)
       const file = req.substring(49)
-      //console.log(file)
       crypto.subtle.digest("SHA-256", new TextEncoder().encode(file)).then(digest => {
         const verify = encode(digest)
-        //console.log('VERIFY:' + verify)
         if (hash === verify) {
-          console.log('saving blob as ' + hash /*+ ' blob:' + file*/)
-          blobstore.set(hash, 'blob:' + file)
+          console.log('saving blob as ' + hash)
+          Deno.writeTextFile(path.blobs() + hash.replaceAll('/', ':'), file)
+          blobstore.set(hash, file)
           if (file.startsWith('image:')) { 
             ws.send(file.substring(6, 50))
           }
@@ -87,26 +77,17 @@ function processReq (req, ws) {
       })
     } else {
       open(req).then(opened => {
-        const dupe = arraystore.filter(msg => msg.hash === opened.hash)
-        if (opened && !dupe[0]) {
-          //log.push(req)
-          arraystore.push(opened)
-          //store.set(opened.hash, opened)
-          console.log('added ' + opened.hash + ' by ' + opened.author)
-          // then we need to make sure we have the data associated with the post
+        if (opened) {
+          logs.add(req)
           if (!blobstore.has(opened.data)) {
             ws.send(opened.data)
           }
           const data = blobstore.get(opened.data) 
-          const previous = arraystore.filter(msg => msg.hash === opened.previous)
-          if (!dupe[0]) { 
-            //console.log('requesting ' + opened.previous)
-            ws.send(opened.previous)
-          }
-        }
-        if (!opened && !blobstore.has(opened.hash)) {
-          //console.log('maybe this is a data blob?')
-          //console.log(req) 
+          logs.getNext(opened.hash).then(next => {
+            if (!next) {
+              ws.send(opened.previous)
+            } 
+          })
         }
       })
     }

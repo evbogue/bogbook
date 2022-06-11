@@ -1,12 +1,11 @@
 import {ensureDir} from 'https://deno.land/std@0.143.0/fs/mod.ts'
 
 export const path = function () {
-  const appdir = Deno.args[0] || 'ssbogs'
+  const appdir = Deno.args[0] || 'bogbookv3'
   const home = Deno.env.get('HOME')
   const fullpath = home + '/.' + appdir + '/'
 
-  ensureDir(fullpath + 'ssbogs') 
-  ensureDir(fullpath + 'inpfs') 
+  ensureDir(fullpath + 'blobs') 
 
   console.log(fullpath)
 
@@ -14,11 +13,8 @@ export const path = function () {
     root: function () {
       return fullpath
     },
-    bogs: function () {
-      return fullpath + 'ssbogs'
-    },
-    inpfs: function () {
-      return fullpath + 'inpfs'
+    blobs: function () {
+      return fullpath + 'blobs/'
     }
   }  
 }()

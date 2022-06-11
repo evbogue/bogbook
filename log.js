@@ -1,72 +1,71 @@
-import { open } from './sbog.js'
+import { open } from './denobog.js'
 import { ensureDir, exists } from 'https://deno.land/std@0.143.0/fs/mod.ts'
+import { path } from './path.js'
 
-if (await exists(path + 'log')) {
-  log = JSON.parse(await Deno.readTextFile(path + 'log'))
-  log.sort((a,b) => a.timestamp - b.timestamp)
+const arraystore = []
+
+var log = []
+
+if (await exists(path.root() + 'log')) {
+  var file = JSON.parse(await Deno.readTextFile(path.root() + 'log'))
+  if (file) {
+    log = file
+    log.map(msg => {
+      open(msg).then(opened => {
+        if (opened) {
+          arraystore.push(opened)
+        }
+      })
+    })
+  }
 }
 
 let newData = false
 
 setInterval(function () {
   if (newData) {
-    Deno.writeTextFile(path + 'log', JSON.stringify(log))
-    Deno.writeTextFile(path + 'config.json', JSON.stringify(config))
-    for (var key in feeds) {
-      var value = feeds[key]
-      Deno.writeTextFile(path + 'bogs/' + key, JSON.stringify(value))
-    }
+    Deno.writeTextFile(path.root() + 'log', JSON.stringify(log))
     newData = false
-  } else {
-    //console.log('No new data')
   }
 }, 10000)
 
 export const logs = function logs (query) {
   return {
-    getLog: async function () {
-      return log
+    getLatest: async function (author) {
+      if (arraystore[0]) {
+        const querylog = arraystore.filter(msg => msg.author == author)
+        querylog.sort((a,b) => a.timestamp - b.timestamp)
+        if (querylog[0]) {
+          return querylog[querylog.length -1]
+        } else { return undefined }
+      } else { return undefined}
     },
-    //getFeeds: function () {
-    //  return feeds
-    //},
-    //getFeed: function (query) {
-    //  if (feeds[query]) {
-    //    return feeds[query]
-    //  }
-    //},
-    query: async function (query) {
-      if (query) {
-        let querylog = []
-        if (log.length) {
-          for (let i = log.length -1; i >= 0; i--) {
-            
-            if ((log[i].raw.substring(0, 44) === query) || (log[i].raw.substring(44,88) == query)) {
-              querylog.unshift(log[i])
-            }
-            if (query.startsWith('?')) {
-              const search = query.substring(1).replace(/%20/g, ' ').toUpperCase()
-              if (log[i].text && log[i].text.toUpperCase().includes(search)) {
-                querylog.unshift(log[i])
-              }
-            }
-            if (i === 0) {
-              return querylog
-            }
-          }
-        }
-      } 
+    getLog: async function () {
+      arraystore.sort((a,b) => a.timestamp - b.timestamp)
+      return arraystore
+    },
+    get: async function (hash) {
+      const msgarray = arraystore.filter(msg => msg.hash == hash)
+      if (msgarray[0]) {
+        return msgarray[0]
+      }
+    },
+    getNext: async function (hash) {
+      if (arraystore[0]) {
+        const findNext = arraystore.filter(msg => msg.previous == hash)
+        if (findNext[0]) {
+          return findNext[0].hash
+        } else return undefined
+      }
     },
     add: function (msg) {
       open(msg).then(opened => {
-        if (opened) {  
-          if (msg.substring(0, 44) === msg.substring(88, 132)) {
-            feeds[msg.substring(44,88)] = [msg]
-            log.push(opened)
-            newData = true
-          } else {
-            feeds[msg.substring(44,88)].unshift(msg)
-            log.push(opened)
+        if (opened) {
+          const dupe = arraystore.filter(msg => msg.hash === opened.hash)
+          if (opened && !dupe[0]) {
+            console.log('added ' + opened.hash + ' by ' + opened.author)
+            log.push(msg)
+            arraystore.push(opened)
             newData = true
           }
         }
