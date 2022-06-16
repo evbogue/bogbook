@@ -1,7 +1,7 @@
 import { keys } from './keys.js'
 import { config } from './config.js'
 import { servePub } from './pub.js'
-import { serveDir } from "https://deno.land/std@0.143.0/http/file_server.ts"
+import { serveDir } from "./file_server.ts"
 import { green } from 'https://deno.land/std@0.143.0/fmt/colors.ts'
 
 console.log(keys.pubkey())
