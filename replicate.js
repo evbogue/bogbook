@@ -22,6 +22,8 @@ setTimeout(function () {
 }, 10000)
 
 export function blast (msg) {
+  console.log('BLASTING')
+  console.log(msg)
   //console.log('BLAST:' + msg)
   //console.log(peers)
   for (const peer of peers.values()) {
@@ -36,6 +38,13 @@ export function blast (msg) {
 function replicate (ws) {
   // first check for my feed
   ws.send(keys.pubkey())
+  logs.getLatest(keys.pubkey()).then(latest => {
+    if (latest) {
+      logs.get(latest).then(msg => {
+        ws.send(msg.raw)
+      })
+    }
+  })
   //logs.getLatest(keys.pubkey()).then(latest => {
   //  if (latest) {
   //    ws.send(keys.pubkey())
@@ -62,25 +71,38 @@ function replicate (ws) {
 
   function start () {
     timer = setInterval(function () {
-      const feeds = []
-      logs.getLog().then(log => {
-        for (let i = log.length - 1; i >= 0 ; i--) {
-          if (!feeds.includes(log[i].author)) {
-            feeds.push(log[i].author)
-          }
-          if (i === 0 && feeds[0]) {
-            feeds.forEach(feed => {
-              logs.getLatest(feed).then(latest => {
-                ws.send(latest)
-                //console.log('make sure server has latest: ' + latest)
-              })
-              //console.log('asking for latest: ' + feed)
-              ws.send(feed)
+      logs.getFeeds().then(feeds => {
+        //console.log(feeds)
+        if (feeds[0]) {
+          feeds.map(feed => {
+            logs.getLatest(feed).then(latest => {
+              //console.log(feed + latest)
+              ws.send('update:' + feed + latest)
             })
-          }
+          })
         }
-      })
-    }, 5000)
+      }) 
+      //const feeds = []
+      //logs.getLog().then(log => {
+      //  for (let i = log.length - 1; i >= 0 ; i--) {
+      //    if (!feeds.includes(log[i].author)) {
+      //      feeds.push(log[i].author)
+      //    }
+      //    if (i === 0 && feeds[0]) {
+      //      feeds.forEach(feed => {
+      //        logs.getLatest(feed).then(latest => {
+      //          console.log(latest)
+      //          ws.send(latest)
+      //          //console.log('make sure server has latest: ' + latest)
+      //        })
+      //        //console.log('asking for latest: ' + feed)
+      //        console.log(feed)
+      //        ws.send(feed)
+      //      })
+      //    }
+      //  }
+      //})
+    }, 10000)
   }
 
   start()
@@ -131,7 +153,7 @@ function processReq (req, ws) {
     })
     setTimeout(function () {
       if (!gotit) {
-        //console.log('WE do not have '+ req +', blasting for it ')
+        console.log('WE do not have '+ req +', blasting for it ')
         blast(req)
       }
     }, 1000)

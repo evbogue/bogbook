@@ -17,8 +17,28 @@ setInterval(function () {
 }, 10000)
 
 function processReq (req, ws) {
-  //console.log(req)
-  if (req.length === 44) {
+  console.log(req)
+  if (req.startsWith('update:')) {
+    //console.log(req)
+    const feedID = req.substring(7, 51)
+    const latestMsg = req.substring(51)
+    //console.log(feedID)
+    //console.log(latestMsg)
+    logs.getFeeds().then(feeds => {
+      //console.log(feeds)
+      feeds.map(feed => {
+        if (feed === feedID) {
+          logs.getLatest(feedID).then(latest => {
+            //console.log(feedID + ' is at ' + latest.hash)
+            if (latest.hash != latestMsg) {
+              console.log('Sending latest of ' + latest.author + ' to ' + ws.pubkey)
+              ws.send(latest.raw)
+            }
+          })
+        }
+      })
+    })
+  } else if (req.length === 44) {
     let sent = false
     logs.getLog(req).then(log => {
       if (!log[0]) {
@@ -62,8 +82,7 @@ function processReq (req, ws) {
         blastcache.push(req)
       }
     }, 100)
-  } 
-  if (req.length > 44) {
+  } else if (req.length > 44) {
     if (req.startsWith('blob:')) {
       const hash = req.substring(5, 49)
       const file = req.substring(49)
@@ -119,6 +138,7 @@ export async function servePub (e) {
   ws.onmessage = (e) => {
     if (e.data.startsWith('connect:')) {
       console.log(e.data)
+      ws.pubkey = e.data.substring(8)
     } else {
       processReq(e.data, ws)
     }

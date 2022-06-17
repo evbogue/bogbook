@@ -54,7 +54,7 @@ export const logs = function logs (query) {
           feeds.push(msg.author)
         }
       })
-      console.log(feeds)
+
       return feeds
     },
     getLog: async function () {

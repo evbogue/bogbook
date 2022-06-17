@@ -40,6 +40,15 @@ export const logs = function logs (query) {
         } 
       } 
     },
+    getFeeds: async function () {
+      const feeds = []
+      arraystore.map(msg => {
+        if (!feeds.includes(msg.author)) {
+          feeds.push(msg.author)
+        }
+      })
+      return feeds
+    },
     getLog: async function () {
       arraystore.sort((a,b) => a.timestamp - b.timestamp)
       return arraystore
