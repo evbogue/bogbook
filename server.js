@@ -13,19 +13,38 @@ console.log(conf)
 async function serve (conn) {
   const httpConn = Deno.serveHttp(conn)
   for await (const e of httpConn) {
-    try {
-      if (e.request.url.endsWith('ws')) {
+    if (e.request.url.endsWith('ws')) {
+      try {
         servePub(e)
-      } else {
-        e.respondWith(serveDir(e.request, {fsRoot: '', showDirListing: true, quiet: true})).catch((error) => {
-          try {
-            conn.close() // coverup for a bug in Deno's http module that errors on connection close
-          } catch {}
-        })
-      }
-    } catch (err) {console.log(error)}
+      } catch (err) { console.log(err)}
+    } else {
+      try {
+        await e.respondWith(serveDir(e.request, {fsRoot: '', showDirListing: true, quiet: true}))
+      } catch (err) {console.log(err)}
+    }
   }
 }
+
+
+
+//async function serve (conn) {
+//  const httpConn = Deno.serveHttp(conn)
+//  for await (const e of httpConn) {
+//    try {
+//      if (e.request.url.endsWith('ws')) {
+//        servePub(e)
+//      } else {
+//        await e.respondWith(serveDir(e.request, {fsRoot: '', showDirListing: true, quiet: true})).catch((error) => {
+//          try {
+//            conn.close() // coverup for a bug in Deno's http module that errors on connection close
+//          } catch {}
+//        })
+//      }
+//    } catch (err) {console.log(error)}
+//  }
+//}
+
+
 
 console.log(green('Listening') + ' at http://' + conf.url + ':' + conf.port + '/')
 

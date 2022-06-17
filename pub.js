@@ -21,13 +21,15 @@ function processReq (req, ws) {
   if (req.length === 44) {
     let sent = false
     logs.getLog(req).then(log => {
-      if (!log[0]) { 
+      if (!log[0]) {
+        //console.log('NO LOG') 
         ws.send(req)
         sent = true
       }
     })
     Deno.stat(path.blobs() + req.replaceAll('/', ':'))
       .then(exists => {
+        //console.log('WE DO NOT HAVE THE BLOB')
         const file = Deno.readTextFileSync(path.blobs() + req.replaceAll('/', ':'))
         blobstore.set(file)
         ws.send('blob:' + req + file)
@@ -35,28 +37,31 @@ function processReq (req, ws) {
       })
       .catch(err => {
         if (blobstore.get(req)) {
+          //console.log('WE HAVE THE BLOB IN MEMORY')
           ws.send('blob:' + req + file)
           sent = true
         } 
       })
     logs.get(req).then(msg => {
-      if (msg) {
+      if (msg && !sent) {
+        //console.log('WE HAVE THE MESSAGE ' + req)
         ws.send(msg.raw)
         sent = true
       }
     })
     logs.getLatest(req).then(latest => {
-      if (latest) {
+      if (latest && !sent) {
         ws.send(latest.hash)
         sent = true
       } 
     })
     setTimeout(function () {
       if (!sent) {
+        //console.log('sending:' + req)
         ws.send(req)
         blastcache.push(req)
       }
-    })
+    }, 100)
   } 
   if (req.length > 44) {
     if (req.startsWith('blob:')) {
@@ -125,5 +130,5 @@ export async function servePub (e) {
 
   ws.onerror = (e) => console.error(e)
 
-  e.respondWith(response)
+  await e.respondWith(response)
 }
