@@ -46,7 +46,7 @@ export async function render (msg) {
         composer(msg)
       ])
       if (replyDiv.firstChild) {
-        replyDiv.insertBefore(replyBox, replyDiv.firstChild)
+        replyDiv.insertBefore(replybox, replyDiv.firstChild)
       } else {
         replyDiv.appendChild(replybox)
       }
