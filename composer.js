@@ -6,7 +6,7 @@ import { save, logs } from './browserlog.js'
 import { render } from './render.js'
 import { getName, getImage } from './avatar.js'
 
-const kv = new IdbKvStore('bogbookv3')
+const kv = new IdbKvStore('drafts')
 
 //function getContacts (textarea, preview) {
 //  const feeds = logs.getFeeds()
