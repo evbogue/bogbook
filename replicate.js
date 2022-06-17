@@ -35,22 +35,23 @@ export function blast (msg) {
 
 function replicate (ws) {
   // first check for my feed
-  logs.getLatest(keys.pubkey()).then(latest => {
-    if (latest) {
-      ws.send(keys.pubkey())
-    } else if (!blastcache.includes(keys.pubkey())) {
-      blastcache.push(keys.pubkey())
-      ws.send(keys.pubkey())
-    }
-  })
+  ws.send(keys.pubkey())
+  //logs.getLatest(keys.pubkey()).then(latest => {
+  //  if (latest) {
+  //    ws.send(keys.pubkey())
+  //  } else if (!blastcache.includes(keys.pubkey())) {
+  //    blastcache.push(keys.pubkey())
+  //    ws.send(keys.pubkey())
+  //  }
+  //})
 
   // next check for the route feed
   var src = window.location.hash.substring(1)
   if (src.length === 44) {
-    //console.log(src)
+    //console.log('checking for route feed' + src)
     logs.query(src).then(query => {
       if (!query && !blastcache.includes(src)) {
-        //console.log('we do not have it')
+        //console.log('we do not have ' + query)
         blastcache.push(src)
         ws.send(src)  
       }
@@ -70,39 +71,27 @@ function replicate (ws) {
           if (i === 0 && feeds[0]) {
             feeds.forEach(feed => {
               logs.getLatest(feed).then(latest => {
-                ws.send(latest.hash)
+                ws.send(latest)
+                //console.log('make sure server has latest: ' + latest)
               })
-              //console.log(feed)
+              //console.log('asking for latest: ' + feed)
               ws.send(feed)
             })
           }
-          //src = window.location.hash.substring(1)
-          //console.log(src)
-          //if (src.length === 44) {
-          //  if (!feeds.includes(src)) {
-          //    logs.get(src).then(got => {
-          //      console.log(got)
-          //      if (!got && ) {
-          //        console.log(' asking for src we do not have it')
-          //        ws.send(src)
-          //      }
-          //    })
-          //  }
-          //}
         }
       })
-    }, 10000)
+    }, 5000)
   }
 
   start()
 
   // if connection closes we clear the timer and try to reconnect
   ws.onclose = (e) => {
-    //clearInterval(timer)
+    clearInterval(timer)
     setTimeout(function () {
       console.log('connection to ' + ws.url + ' closed, reconnecting')
       connect(ws.url, keys)
-    }, 1000)
+    }, 10000)
   }
 }
 

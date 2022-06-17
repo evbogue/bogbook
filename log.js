@@ -54,8 +54,11 @@ export const logs = function logs (query) {
       if (arraystore[0]) {
         const findNext = arraystore.filter(msg => msg.previous == hash)
         if (findNext[0]) {
+          //console.log('NEXT: ' + findNext[0].hash)
           return findNext[0].hash
-        } else return undefined
+        } if (!findNext[0]) {
+          //console.log('we do not have NEXT')
+        }
       }
     },
     add: function (msg) {

@@ -17,6 +17,7 @@ setInterval(function () {
 }, 10000)
 
 function processReq (req, ws) {
+  //console.log(req)
   if (req.length === 44) {
     let sent = false
     logs.getLog(req).then(log => {
@@ -64,15 +65,19 @@ function processReq (req, ws) {
       crypto.subtle.digest("SHA-256", new TextEncoder().encode(file)).then(digest => {
         const verify = encode(digest)
         if (hash === verify) {
-          console.log('saving blob as ' + hash)
-          Deno.writeTextFile(path.blobs() + hash.replaceAll('/', ':'), file)
-          blobstore.set(hash, file)
-          if (file.startsWith('image:')) { 
-            ws.send(file.substring(6, 50))
-          }
-          if (file.startsWith('name:')) {
-            ws.send(file.substring(5, 49))
-          }
+          Deno.stat(path.blobs() + hash.replaceAll('/', ':'))
+          .then(exists => {
+          })
+          .catch(err => {
+            Deno.writeTextFile(path.blobs() + hash.replaceAll('/', ':'), file)
+            blobstore.set(hash, file)
+            if (file.startsWith('image:')) {
+              ws.send(file.substring(6, 50))
+            }
+            if (file.startsWith('name:')) {
+              ws.send(file.substring(5, 49))
+            }
+          })
         }
       })
     } else {
@@ -82,12 +87,15 @@ function processReq (req, ws) {
           if (!blobstore.has(opened.data)) {
             ws.send(opened.data)
           }
-          const data = blobstore.get(opened.data) 
-          logs.getNext(opened.hash).then(next => {
-            if (!next) {
-              ws.send(opened.previous)
-            } 
-          })
+          const data = blobstore.get(opened.data)
+          if (opened.hash != opened.previous) { 
+            logs.getNext(opened.hash).then(next => {
+              if (!next) {
+                //console.log('ASKING FOR NEXT :' + opened.previous)
+                ws.send(opened.previous)
+              } 
+            })
+          }
         }
       })
     }

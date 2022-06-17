@@ -40,13 +40,11 @@ export const logs = function logs (query) {
     getLatest: async function (query) {
       if (arraystore[0]) {
         const querylog = arraystore.filter(msg => msg.author == query)
-        querylog.sort((a,b) => a.timestamp - b.timestamp)
         if (querylog[0]) {
-          return querylog[querylog.length -1].hash
-        } else {
-          return undefined
+          querylog.sort((a,b) => a.timestamp - b.timestamp)
+          return querylog[querylog.length - 1].hash
         }
-      } else { return undefined }
+      } 
     },
     getLog: async function () {
       arraystore.sort((a,b) => a.timestamp - b.timestamp)
@@ -68,23 +66,29 @@ export const logs = function logs (query) {
     getNext: async function (hash) {
       if (arraystore[0]) {
         const findNext = arraystore.filter(msg => msg.previous == hash)
-        if (findNext[0]) {
+        if (findNext[0] && findNext[0].hash != hash) {
+          //console.log(hash + '\'s next message is ' + findNext[0].hash)
           return findNext[0].hash
-        } else return undefined
+        }
       }
     },
     get: async function (hash) {
       const msgarray = arraystore.filter(msg => msg.hash == hash)
       if (msgarray[0]) {
+        //console.log('we have ' + hash)
         return msgarray[0]
       } else {
-        blast(hash)
+        //console.log('we do not have ' + hash)
       }
     }, 
     add: function (msg) {
       open(msg).then(opened => {
-        const dupe = arraystore.filter(msg => msg.hash === opened.hash)
+        const dupe = arraystore.filter(message => message.hash === opened.hash)
+        if (dupe[0]) {
+          //console.log('we already have ' + opened.hash + ' not adding')
+        }
         if (opened && !dupe[0]) {
+          //console.log('we do not have ' + opened.hash + ' adding')
           log.push(msg)
           arraystore.push(opened)
           newData = true
