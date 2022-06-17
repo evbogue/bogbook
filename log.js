@@ -37,8 +37,8 @@ export const logs = function logs (query) {
         querylog.sort((a,b) => a.timestamp - b.timestamp)
         if (querylog[0]) {
           return querylog[querylog.length -1]
-        } else { return undefined }
-      } else { return undefined}
+        } 
+      } 
     },
     getLog: async function () {
       arraystore.sort((a,b) => a.timestamp - b.timestamp)
@@ -48,17 +48,6 @@ export const logs = function logs (query) {
       const msgarray = arraystore.filter(msg => msg.hash == hash)
       if (msgarray[0]) {
         return msgarray[0]
-      }
-    },
-    getNext: async function (hash) {
-      if (arraystore[0]) {
-        const findNext = arraystore.filter(msg => msg.previous == hash)
-        if (findNext[0]) {
-          //console.log('NEXT: ' + findNext[0].hash)
-          return findNext[0].hash
-        } if (!findNext[0]) {
-          //console.log('we do not have NEXT')
-        }
       }
     },
     add: function (msg) {

@@ -89,7 +89,8 @@ function processReq (req, ws) {
           }
           const data = blobstore.get(opened.data)
           if (opened.hash != opened.previous) { 
-            logs.getNext(opened.hash).then(next => {
+            logs.get(opened.previous).then(next => {
+              //console.log(next)
               if (!next) {
                 //console.log('ASKING FOR NEXT :' + opened.previous)
                 ws.send(opened.previous)
