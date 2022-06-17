@@ -24,11 +24,11 @@ export async function find (inpns) {
       return file
     }
   }
-  //setTimeout(function () {
-  //  if (!file) {
-  //    console.log('WE DONT HAVE THE FILE')
-  //    blast(inpns)
-  //    //return null
-  //  }
-  //}, 500) 
+  setTimeout(function () {
+    if (!file) {
+      console.log('WE DONT HAVE THE FILE')
+      blast(inpns)
+      //return null
+    }
+  }, 500) 
 }
