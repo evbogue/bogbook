@@ -149,6 +149,7 @@ export async function servePub (e) {
   }
 
   ws.onerror = (e) => console.error(e)
-
-  await e.respondWith(response)
+  try {
+    await e.respondWith(response)
+  } catch (err) {}
 }
