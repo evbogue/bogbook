@@ -30,7 +30,7 @@ let newData = true
 setInterval(function () {
   if (newData) {
     //arraystore.sort((a,b) => a.timestamp - b.timestamp)
-    kv.set(log, log)
+    kv.set('log', log)
     newData = false
   }
 }, 10000)
