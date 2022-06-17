@@ -23,10 +23,12 @@ export async function find (inpns) {
     if (inpns === verify) {
       return file
     }
-  } 
-  if (!file) {
-    //console.log('WE DONT HAVE THE FILE')
-    blast(inpns)
-    //return null
   }
+  //setTimeout(function () {
+  //  if (!file) {
+  //    console.log('WE DONT HAVE THE FILE')
+  //    blast(inpns)
+  //    //return null
+  //  }
+  //}, 500) 
 }
