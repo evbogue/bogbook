@@ -17,7 +17,7 @@ setInterval(function () {
 }, 10000)
 
 function processReq (req, ws) {
-  console.log(req)
+  //console.log(req)
   if (req.startsWith('update:')) {
     //console.log(req)
     const feedID = req.substring(7, 51)
