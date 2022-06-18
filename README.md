@@ -4,6 +4,33 @@
 
 This is my third attempt at making a distributed social network, the big difference between Bogbook v3 and Bogbook v2 is that I stopped using append-only logs, and now we are using a hash chain with no sequence order. 
 
+The benefits of this are:
+
++ No need to sync the entire chain to begin interacting
++ You can use keypairs on multiple devices without completely breaking replication
+
+The downsides are: 
+
++ less security guarantees than an append-only log
+
+### Get started
+
+Get yourself a copy of the [Deno](https://deno.land/) JavaScript runtime.
+
+```
+deno run --allow-all server.js
+```
+
+and navigate to http://localhost:8080
+
+Generate a keypair, and then post a message!
+
+...
+
+or try it online! http://bogbook.com/
+
+Visit my profile page [here](http://bogbook.com/#e+2bu3W0KeR00URX75mVtFsFrTgTfAW2R3+F9W+s324=) and say hello!
+
 ### How it works
 
 When you publish a new post it references the sha256 hash of the previous post. If this is your first post then the hash of the post and the previous hash will be identical, and that is called a "root" post. The replication algorithm will stop trying to sync posts when it reaches the root.
@@ -44,8 +71,6 @@ And from that we create a message object:
 ```
 
 This means we are not signing a JSON.stringified object, which should make it easier to port this to other programming languages.
-
-
 
 ---
 MIT
