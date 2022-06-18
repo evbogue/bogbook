@@ -13,15 +13,17 @@ console.log(conf)
 async function serve (conn) {
   const httpConn = Deno.serveHttp(conn)
   for await (const e of httpConn) {
-    if (e.request.url.endsWith('ws')) {
-      try {
-        servePub(e)
-      } catch (err) { console.log(err)}
-    } else {
-      try {
+    try {
+      if (e.request.url.endsWith('ws')) {
+        try {
+          servePub(e)
+        } catch (err) { console.log(err)}
+      } else {
+       try {
         await e.respondWith(serveDir(e.request, {fsRoot: '', showDirListing: true, quiet: true}))
-      } catch (err) {console.log(err)}
-    }
+        } catch (err) {console.log(err)}
+      }
+    } catch (err) {console.log(err)}
   }
 }
 
