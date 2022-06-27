@@ -12,6 +12,10 @@ function start () {
   } else if (keys) {
     const proto = window.location.protocol === 'https:' ? 'wss://' : 'ws://'
     const server = [proto + window.location.host + '/ws']
+    document.addEventListener('click', () => {
+      Notification.requestPermission()
+    })
+
     connect(server)
     route()
     navbar() 

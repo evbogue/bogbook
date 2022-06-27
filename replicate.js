@@ -4,8 +4,11 @@ import { render } from './render.js'
 import { open } from './sbog.js'
 import { make, find } from './inpfs.js'
 import { encode } from './lib/base64.js'
+import { getName } from './avatar.js'
 
 const peers = new Map()
+
+const kv = new IdbKvStore('drafts')
 
 let blastcache = []
 let times = 0
@@ -185,6 +188,10 @@ function processReq (req, ws) {
               if (!getMsg) {
                 const scroller = document.getElementById('scroller')
                 render(opened).then(rendered => {
+                  if (Notification.permission === "granted") {
+                    const notification = new Notification(opened.author.substring(0, 5) + ': ' + opened.text)
+                  }
+
                   // check if a message already has this as previous, then see if we can find that message on the screen and insert the message underneath it. If we cannot find the message on the screen, then append at the bottom of the scroller. If we do not have a message that contains the previous then we put it at the top because it should be new.
                   logs.getNext(opened.hash).then(next => {
                     console.log('NEXT: ' + next)
