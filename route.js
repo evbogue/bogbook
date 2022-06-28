@@ -13,7 +13,7 @@ export function route () {
   const src = window.location.hash.substring(1)
   document.title = location.host + ' | ' + location.hash.substring(1)
 
-  if (location.hash.substring(1) = '') {
+  if (location.hash.substring(1) === '') {
     document.title = location.host + ' | Home'
   }
 
