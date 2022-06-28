@@ -25,8 +25,8 @@ setTimeout(function () {
 }, 10000)
 
 export function blast (msg) {
-  console.log('BLASTING')
-  console.log(msg)
+  //console.log('BLASTING')
+  //console.log(msg)
   //console.log('BLAST:' + msg)
   //console.log(peers)
   for (const peer of peers.values()) {
@@ -160,7 +160,7 @@ function processReq (req, ws) {
     }
     setTimeout(function () {
       if (!gotit) {
-        console.log('WE do not have '+ req +', blasting for it ')
+        //console.log('WE do not have '+ req +', blasting for it ')
         blast(req)
       }
     }, 1000)
@@ -180,17 +180,15 @@ function processReq (req, ws) {
         feeds.map(feed => {
           if (feed === feedID) {
             logs.getLatest(feedID).then(latest => {
-              console.log(feedID + ' is at ' + latest.hash)
+              //console.log(feedID + ' is at ' + latest.hash)
               if (latest.hash != latestMsg) {
-                console.log('Sending latest of ' + latest.author + ' to ' + ws.pubkey)
+                //console.log('Sending latest of ' + latest.author + ' to ' + ws.pubkey)
                 ws.send(latest.raw)
               }
             })
           }
         })
       })
-
-      console.log(req)
     } else if (req.startsWith('blob')) {
       //console.log('THIS IS A BLOB')
       const hash = req.substring(5, 49)
@@ -217,7 +215,6 @@ function processReq (req, ws) {
               if (!getMsg) {
                 const scroller = document.getElementById('scroller')
                 render(opened).then(rendered => {
-                  console.log(opened.date > Date.now() - 10000)
                   if (Notification.permission === "granted") {
                     const notification = new Notification(opened.author.substring(0, 5) + ': ' + opened.text)
                   }
