@@ -11,6 +11,7 @@ export function route () {
   screen.appendChild(scroller)
   
   const src = window.location.hash.substring(1)
+  document.title = location.host + ' | ' + location.hash.substring(1)
 
   if (src === '') {
     home(scroller)

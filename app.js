@@ -8,7 +8,8 @@ if (!window.location.hash) { window.location = '#' }
 
 function start () {
   if (keys === 'welcome') {
-    document.body.appendChild(welcome) 
+    document.body.appendChild(welcome)
+    document.title = location.host + ' | Welcome'
   } else if (keys) {
     const proto = window.location.protocol === 'https:' ? 'wss://' : 'ws://'
     const server = [proto + window.location.host + '/ws']
