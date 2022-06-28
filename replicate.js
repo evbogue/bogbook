@@ -183,6 +183,24 @@ function processReq (req, ws) {
         }
       }
     }
+    else if (req.startsWith('disconnect:')) {
+      console.log(req)
+      const got = document.getElementById('connect:' + req.substring(11))
+      if (got) {
+        got.parentNode.removeChild(got)
+      }
+      const disconnect = h('div', {classList: 'message', id: req}, [
+        h('a', {href: '#' + req.substring(11)}, [getBoth(req.substring(11))]),
+        ' disconnected.'
+      ])
+      scroller.insertBefore(disconnect, scroller.childNodes[1])
+      if (req.substring(11) != keys.pubkey()) {
+        if (Notification.permission === "granted") {
+          const notification = new Notification(req.substring(11, 18) + ' connected.')
+        }
+      }
+
+    }
     else if (req.startsWith('update')) {
       //console.log(req)
       const feedID = req.substring(7, 51)
@@ -276,6 +294,10 @@ export function connect (server) {
   ws.onmessage = (msg) => {
     processReq(msg.data, ws)
   }
+
+  addEventListener('beforeunload', event => { 
+    ws.send('disconnect:' + keys.pubkey())
+  })
 
   ws.onclose = (e) => {
     peers.delete(id)
