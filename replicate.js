@@ -172,8 +172,8 @@ function processReq (req, ws) {
       if (got) {
         got.parentNode.removeChild(got)
       }
-      const connect = h('div', {classList: 'message'}, [
-        h('a', {href: '#' + req.substring(8), id: req}, [getBoth(req.substring(8))]),
+      const connect = h('div', {classList: 'message', id: req}, [
+        h('a', {href: '#' + req.substring(8)}, [getBoth(req.substring(8))]),
         ' connected.'
       ])
       scroller.insertBefore(connect, scroller.childNodes[1])
