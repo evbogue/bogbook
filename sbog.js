@@ -14,7 +14,8 @@ export async function publish (data) {
 
   const hash = encode(sha256(new TextEncoder().encode(msg)))
 
-  let previous = await logs.getLatest(keys.pubkey())
+  let previous = await logs.getLatest(keys.pubkey()).hash
+  console.log('PREVIOUS:' + previous)
 
   if (!previous) {
     previous = hash

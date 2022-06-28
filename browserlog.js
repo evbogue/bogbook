@@ -42,7 +42,7 @@ export const logs = function logs (query) {
         const querylog = arraystore.filter(msg => msg.author == query)
         if (querylog[0]) {
           querylog.sort((a,b) => a.timestamp - b.timestamp)
-          return querylog[querylog.length - 1].hash
+          return querylog[querylog.length - 1]
         }
       } 
     },

@@ -43,7 +43,7 @@ function replicate (ws) {
   ws.send(keys.pubkey())
   logs.getLatest(keys.pubkey()).then(latest => {
     if (latest) {
-      logs.get(latest).then(msg => {
+      logs.get(latest.hash).then(msg => {
         ws.send(msg.raw)
       })
     }
@@ -80,7 +80,7 @@ function replicate (ws) {
           feeds.map(feed => {
             logs.getLatest(feed).then(latest => {
               //console.log(feed + latest)
-              ws.send('update:' + feed + latest)
+              ws.send('update:' + feed + latest.hash)
             })
           })
         }
@@ -125,11 +125,14 @@ let serverId = 0
 function processReq (req, ws) {
   if (req.length === 44) {
     let gotit = false
+    if (req === keys.pubkey()) {
+      gotit = true
+    }
     //console.log('check to see if '+ req + ' is a feed')
     logs.getLatest(req).then(latest => {
       if (latest) {
         //console.log(req  + ' is a feed we have, sending')
-        logs.get(latest).then(got => {
+        logs.get(latest.hash).then(got => {
           if (got) {
             gotit = true
             ws.send(got.hash)
@@ -144,16 +147,17 @@ function processReq (req, ws) {
           } 
         })
       }
-    }) 
-
-    find(req).then(file => {
-      if (file) {
-        gotit = true
-        //console.log(req + ' is a blob, sending')
-        //console.log(file)
-        ws.send('blob:' + req + file)
-      }
     })
+    if (!gotit) {
+      find(req).then(file => {
+        if (file) {
+          gotit = true
+          //console.log(req + ' is a blob, sending')
+          //console.log(file)
+          ws.send('blob:' + req + file)
+        }
+      })
+    }
     setTimeout(function () {
       if (!gotit) {
         console.log('WE do not have '+ req +', blasting for it ')
@@ -162,7 +166,32 @@ function processReq (req, ws) {
     }, 1000)
   } 
   if (req.length > 44) {
-    if (req.startsWith('blob')) {
+    if (req.startsWith('connect:')) {
+      console.log(req)
+    }
+    else if (req.startsWith('update')) {
+      //console.log(req)
+      const feedID = req.substring(7, 51)
+      const latestMsg = req.substring(51)
+      //console.log(feedID)
+      //console.log(latestMsg)
+      logs.getFeeds().then(feeds => {
+        //console.log(feeds)
+        feeds.map(feed => {
+          if (feed === feedID) {
+            logs.getLatest(feedID).then(latest => {
+              console.log(feedID + ' is at ' + latest.hash)
+              if (latest.hash != latestMsg) {
+                console.log('Sending latest of ' + latest.author + ' to ' + ws.pubkey)
+                ws.send(latest.raw)
+              }
+            })
+          }
+        })
+      })
+
+      console.log(req)
+    } else if (req.startsWith('blob')) {
       //console.log('THIS IS A BLOB')
       const hash = req.substring(5, 49)
       const file = req.substring(49)
@@ -188,6 +217,7 @@ function processReq (req, ws) {
               if (!getMsg) {
                 const scroller = document.getElementById('scroller')
                 render(opened).then(rendered => {
+                  console.log(opened.date > Date.now() - 10000)
                   if (Notification.permission === "granted") {
                     const notification = new Notification(opened.author.substring(0, 5) + ': ' + opened.text)
                   }
