@@ -4,7 +4,8 @@ import { render } from './render.js'
 import { open } from './sbog.js'
 import { make, find } from './inpfs.js'
 import { encode } from './lib/base64.js'
-import { getName } from './avatar.js'
+import { getBoth } from './avatar.js'
+import { h } from './lib/misc.js'
 
 const peers = new Map()
 
@@ -167,7 +168,20 @@ function processReq (req, ws) {
   } 
   if (req.length > 44) {
     if (req.startsWith('connect:')) {
-      console.log(req)
+      const got = document.getElementById(req)
+      if (got) {
+        got.parentNode.removeChild(got)
+      }
+      const connect = h('div', {classList: 'message'}, [
+        h('a', {href: '#' + req.substring(8), id: req}, [getBoth(req.substring(8))]),
+        ' connected.'
+      ])
+      scroller.insertBefore(connect, scroller.childNodes[1])
+      if (req.substring(8) != keys.pubkey()) {
+        if (Notification.permission === "granted") {
+          const notification = new Notification(req.substring(8, 13) + ' connected.')
+        }
+      }
     }
     else if (req.startsWith('update')) {
       //console.log(req)
