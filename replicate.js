@@ -196,7 +196,7 @@ function processReq (req, ws) {
       scroller.insertBefore(disconnect, scroller.childNodes[1])
       if (req.substring(11) != keys.pubkey()) {
         if (Notification.permission === "granted") {
-          const notification = new Notification(req.substring(11, 18) + ' connected.')
+          const notification = new Notification(req.substring(11, 18) + ' disconnected.')
         }
       }
 
