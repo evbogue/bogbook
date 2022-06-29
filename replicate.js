@@ -189,7 +189,7 @@ function processReq (req, ws) {
       if (got) {
         got.parentNode.removeChild(got)
       }
-      const disconnect = h('div', {classList: 'message', id: req}, [
+      const disconnect = h('div', {classList: 'message', id: 'connect:' + req.substring(11)}, [
         h('a', {href: '#' + req.substring(11)}, [getBoth(req.substring(11))]),
         ' disconnected.'
       ])
