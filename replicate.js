@@ -168,10 +168,10 @@ function processReq (req, ws) {
   } 
   if (req.length > 44) {
     if (req.startsWith('connect:')) {
+      const disgot = document.getElementById('disconnect:' + req.substring(8))
+      if (disgot) { got.parentNode.removeChild(disgot) }
       const got = document.getElementById(req)
-      if (got) {
-        got.parentNode.removeChild(got)
-      }
+      if (got) { got.parentNode.removeChild(got) }
       const connect = h('div', {classList: 'message', id: req}, [
         h('a', {href: '#' + req.substring(8)}, [getBoth(req.substring(8))]),
         ' connected.'
@@ -185,10 +185,10 @@ function processReq (req, ws) {
     }
     else if (req.startsWith('disconnect:')) {
       console.log(req)
+      const disgot = document.getElementById(req)
+      if (disgot) { got.parentNode.removeChild(disgot) }
       const got = document.getElementById('connect:' + req.substring(11))
-      if (got) {
-        got.parentNode.removeChild(got)
-      }
+      if (got) { got.parentNode.removeChild(got) }
       const disconnect = h('div', {classList: 'message', id: 'connect:' + req.substring(11)}, [
         h('a', {href: '#' + req.substring(11)}, [getBoth(req.substring(11))]),
         ' disconnected.'
