@@ -8,10 +8,16 @@ export function navbar (screen) {
   const internal = h('div', {classList: 'internal'}, [
     getBoth(keys.pubkey()),
     ' ',
+    h('code', [keys.pubkey().substring(0, 7)]),
+    ' ',
     h('a', {href: '#'}, ['Home']),
     ' ',
     h('a', {href: '#key'}, ['Key']),
-    h('a', {href: 'https://git.sr.ht/~ev/bogbookv3', classList: 'right'}, ['Git'])
+    h('span', {classList: 'right'}, [
+      h('a', {href: 'https://github.com/evbogue/bogbook'}, ['github']),
+      h('code', [' / ']),
+      h('a', {href: 'https://git.sr.ht/~ev/bogbookv3'}, ['sr.ht'])
+    ])
   ])
   navbar.appendChild(internal)
 }

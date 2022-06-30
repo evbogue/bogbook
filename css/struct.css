@@ -20,6 +20,7 @@ pre, code {
   white-space: -moz-pre-wrap;
   white-space: pre-wrap;
   white-space: pre\9;
+  color: #333;
 }
 
 #screen {
