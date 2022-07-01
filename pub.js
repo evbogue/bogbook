@@ -18,7 +18,7 @@ setInterval(function () {
 
 export function processReq (req, ws) {
   //console.log(req)
-  if req.startsWith('connect:') {
+  if (req.startsWith('connect:')) {
     console.log(req)
   } else if (req.startsWith('disconnect:')) {
     console.log(req)
