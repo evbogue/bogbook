@@ -16,7 +16,7 @@ setInterval(function () {
   blastcache = []
 }, 10000)
 
-function processReq (req, ws) {
+export function processReq (req, ws) {
   //console.log(req)
   if (req.startsWith('update:')) {
     //console.log(req)
