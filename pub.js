@@ -56,7 +56,9 @@ export function processReq (req, ws) {
         //console.log('WE DO NOT HAVE THE BLOB')
         const file = Deno.readTextFileSync(path.blobs() + req.replaceAll('/', ':'))
         blobstore.set(file)
-        ws.send('blob:' + req + file)
+        if (file) {
+          ws.send('blob:' + req + file)
+        }
         sent = true
       })
       .catch(err => {
