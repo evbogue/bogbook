@@ -18,7 +18,11 @@ setInterval(function () {
 
 export function processReq (req, ws) {
   //console.log(req)
-  if (req.startsWith('update:')) {
+  if req.startsWith('connect:') {
+    console.log(req)
+  } else if (req.startsWith('disconnect:')) {
+    console.log(req)
+  } else if (req.startsWith('update:')) {
     //console.log(req)
     const feedID = req.substring(7, 51)
     const latestMsg = req.substring(51)
