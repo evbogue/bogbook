@@ -15,7 +15,7 @@ export function navbar (screen) {
     h('a', {href: '#key'}, ['Key']),
     h('span', {classList: 'right'}, [
       h('a', {href: 'https://github.com/evbogue/bogbook'}, ['github']),
-      h('code', [' / ']),
+      h('code', [' or ']),
       h('a', {href: 'https://git.sr.ht/~ev/bogbookv3'}, ['sr.ht'])
     ])
   ])
