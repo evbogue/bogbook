@@ -38,7 +38,7 @@ renderer.paragraph = function (paragraph) {
 }
 
 renderer.link = function (href, title, text) {
-  if (href.length == 44 && !startsWith('http')) {
+  if (href.length == 44 && !href.startsWith('http')) {
     //var image
     //if (cache[href]) {
     //  image = '<a href="#' + href +'"><img src="' + cache[href].image + '" class="avatar ' + cache[href].filter + '" /></a>'
