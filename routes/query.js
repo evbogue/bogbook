@@ -10,7 +10,7 @@ import { blast } from './../replicate.js'
 import { composer } from './../composer.js'
 
 function photoAdder (src, div) {
-  const uploadButton = h('button', {title: 'New photo', onclick: function () {
+  const uploadButton = h('button', {title: 'New photo', classList: 'btn', onclick: function () {
     input.click()
   }}, ['📸  '])
 
@@ -27,7 +27,7 @@ function photoAdder (src, div) {
       make(img.src).then(hash => {
         const imgDiv = h('div', [
           img,
-          h('button', { onclick: function () {
+          h('button', {classList: 'btn', onclick: function () {
             publish('image:' + hash + src).then(msg => {
               open(msg).then(opened => {
                 render(opened).then(rendered => {
@@ -55,14 +55,14 @@ export function query (scroller, src) {
   messageDiv.appendChild(header)
 
   const nameDiv = h('span', [
-    h('button', {title: 'New name',  onclick: function () {
+    h('button', {title: 'New name', classList: 'btn',  onclick: function () {
       header.appendChild(newName(src, messageDiv))
       nameDiv.parentNode.removeChild(nameDiv)
     }}, ['🏷️'])
   ])
 
   const composeDiv = h('span', [
-    h('button', {title: 'New reply', onclick: function () {
+    h('button', {title: 'New reply', classList: 'btn',  onclick: function () {
       header.appendChild(composer({author: src, hash: src}))
       composeDiv.parentNode.removeChild(composeDiv)
     }}, ['📝'])

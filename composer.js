@@ -11,14 +11,14 @@ const kv = new IdbKvStore('drafts')
 function getContacts (textarea, preview) {
   var span = h('span')
 
-  var button = h('button', {onclick: function () {
+  var button = h('button', {classList: 'btn right', onclick: function () {
     if (!span.childNodes[1]) {
       var addrs = h('span')
       span.appendChild(addrs)
 
       logs.getFeeds().then(feeds => {
         feeds.map(feed => {
-          addrs.appendChild(h('button', {onclick: function () {
+          addrs.appendChild(h('button', {classList: 'right btn', onclick: function () {
             kv.get('name:' + feed).then(name => {
               if (textarea.selectionStart || textarea.selectionEnd) {
                 textarea.value = textarea.value.substring(0, textarea.selectionStart)
@@ -44,7 +44,7 @@ function getContacts (textarea, preview) {
 
 function photoAdder (textarea, preview) {
 
-  const uploadButton = h('button', {onclick: function () {
+  const uploadButton = h('button', {classList: 'btn right', onclick: function () {
     input.click()
   }}, ['📸 '])
 
@@ -83,7 +83,7 @@ function photoAdder (textarea, preview) {
 }
 
 export function composer (msg) {
-  let preview = h('div')
+  let preview = h('div', [h('p', [' '])])
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
@@ -122,6 +122,7 @@ export function composer (msg) {
   })
 
   const publishButton = h('button', {
+    classList: 'btn btn-primary',
     onclick: function () {
       if (textarea.value) {
         publish(textarea.value).then(published => {
@@ -134,7 +135,7 @@ export function composer (msg) {
               } else {
                 scroller.insertBefore(rendered, scroller.childNodes[1])
               }
-              preview.innerHTML = ''
+              preview.innerHTML = '<p></p>'
               textarea.value = ''
               kv.remove('draft:' + msg.hash)
               save()
@@ -154,7 +155,7 @@ export function composer (msg) {
   ])
 
   if (!(msg.hash === 'home' || msg.hash === msg.author)) {
-    const cancelButton = h('button', {onclick: function () {
+    const cancelButton = h('button', {classList: 'btn btn-warning', onclick: function () {
       compose.parentNode.parentNode.removeChild(compose.parentNode)
     }}, ['Cancel'])
     compose.appendChild(cancelButton)

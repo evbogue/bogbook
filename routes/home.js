@@ -8,7 +8,7 @@ import { adder } from './../adder.js'
 export function home (scroller) {
 
   const composemsg = h('div', {classList: 'message'}, [
-    h('span', {classList: 'right'}, ['Preview']),
+    h('code', {classList: 'right'}, ['Preview']),
     getBoth(keys.pubkey()),
     composer({hash: 'home'})
   ])

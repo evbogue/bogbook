@@ -13,7 +13,7 @@ export function keyroute (scroller) {
   const div = h('div', {classList: 'message'}, [
     //h('span', ['Import a keypair:']),
     textarea,
-    h('button', {onclick: function () {
+    h('button', {classList: 'btn btn-success', onclick: function () {
       if (textarea.value && (textarea.value.length === 132)) {
         kv.set('keypair', textarea.value).then(function () {
           location.hash = ''
@@ -24,13 +24,13 @@ export function keyroute (scroller) {
         textarea.value = keys.keypair()
       }
     }}, ['Import']),
-    h('button', {onclick: function () {
+    h('button', {classList: 'btn btn-danger', onclick: function () {
       kv.remove('keypair').then(function () {
         location.hash = ''
         location.reload()
       })
     }}, ['Delete Keypair']),
-    h('button', {onclick: function () {
+    h('button', {classList: 'btn btn-warning', onclick: function () {
       kv.clear().then(function () {
         location.hash = ''
         location.reload()

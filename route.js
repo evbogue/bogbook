@@ -2,10 +2,12 @@ import { h } from './lib/misc.js'
 import { home } from './routes/home.js'
 import { query } from './routes/query.js'
 import { keyroute } from './routes/key.js'
+import { navbar } from './navbar.js'
 
 export function route () {
-  const screen = h('div', {id: 'screen'})
+  const screen = h('div', {id: 'screen', classList: 'container'})
   document.body.appendChild(screen)
+  screen.appendChild(navbar())
 
   const scroller = h('div', {id: 'scroller'})
   screen.appendChild(scroller)
@@ -27,6 +29,7 @@ export function route () {
 
   window.onhashchange = function () {
     screen.parentNode.removeChild(screen)
+    screen.appendChild(navbar())
     route()
   }
 }

@@ -1,15 +1,27 @@
 body {
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
-  font-family: sans-serif;
-  background: #fcfcfc;
+  background: #fafafa;
 }
 
-button {
-  font-size: 1em;
-  margin-top: 5px; margin-right: 5px;
-  border: 1px solid #ccc;
+.message {
+  padding: .75em;
+  background: white;
+  border: 1px solid #efefef;
+  margin-top: 7px;
+  border-radius: 7px;
+}
+
+.message, .message > * {
+  animation: fadein .5s;
+}
+
+#scroller { margin-top: 55px;}
+
+@media only screen and (max-width: 680px) {
+  #scroller { margin-top: 0px; }
+}
+
+.indent {
+  margin-left: 2em;
 }
 
 pre, code {
@@ -20,104 +32,21 @@ pre, code {
   white-space: -moz-pre-wrap;
   white-space: pre-wrap;
   white-space: pre\9;
-  color: #999;
 }
 
-#screen {
-  position: absolute;
-  top: 30px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-#navbar {
-  width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  position: fixed;
-  top: 0;
-  left: 0; right: 0;
-  padding-top: .2rem;
-  z-index: 1000;
-  padding-bottom: .2rem;
-}
-
-#navbar .internal {
-  max-width: 97%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#scroller {
-  width: 680px;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.message {
-  padding: .25em;
-  background: #fff;
-  border: 1px solid #eee;
-  margin-top: 3px;
-  border-radius: 5px;
-}
-
-.indent {
-  margin-left: 2em;
-}
-
-.message, .message > * {
-  animation: fadein .5s;
-}
 
 @keyframes fadein {
     from { opacity: 0; }
     to   { opacity: 1; }
 }
 
-a {
-  text-decoration: none;
-  color: #2196f3;
+textarea {
+  width: 100%;
 }
 
 .avatar {
   width: 22px;
   height: 22px;
-  vertical-align: middle;
-  object-fit: cover;
-}
-
-textarea {
-  font-family: sans-serif;
-  width: 100%;
-  height: 125px;
-}
-
-@media only screen and (max-width: 680px) {
-  #screen { top: 40px; }
-  textarea {height: 175px; }
-  body {font-size: 1.15em;}
-  .avatar {width: 32px; height: 32px;}
-}
-
-textarea, input {
-  background: #fafafa;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  margin-top: 5px;
-  font-size: 1em;
-}
-
-img {
-  border-radius: 5px;
-  max-width: 100%;
-}
-
-.thumb {
-  width: 75px; 
-  height: 75px; 
   vertical-align: middle;
   object-fit: cover;
 }

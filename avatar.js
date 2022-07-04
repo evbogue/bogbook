@@ -10,7 +10,7 @@ const kv = new IdbKvStore('drafts')
 
 export function getImage (id) {
   let img = vb(decode(id), 256)
-  img.classList = 'avatar'
+  img.classList = 'avatar img-rounded'
 
   logs.query(id).then(querylog => {
     if (querylog && querylog[0]) {
@@ -66,7 +66,7 @@ export function newName (id, div) {
 
   const nameDiv = h('div', [
     input,
-    h('button', {onclick: function () {
+    h('button', {classList: 'btn', onclick: function () {
       if (input.value.length === keys.keypair().length) {
         alert('Error: Names cannot be the same length as your keypair!')
       }

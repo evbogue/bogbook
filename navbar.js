@@ -3,21 +3,16 @@ import { keys } from './browserkeys.js'
 import { getBoth } from './avatar.js'
 
 export function navbar (screen) {
-  const navbar = h('div', {id: 'navbar'})
-  document.body.appendChild(navbar)
-  const internal = h('div', {classList: 'internal'}, [
-    getBoth(keys.pubkey()),
-    ' ',
-    h('code', [keys.pubkey().substring(0, 7)]),
-    ' ',
-    h('a', {href: '#'}, ['Home']),
-    ' ',
-    h('a', {href: '#key'}, ['Key']),
-    h('span', {classList: 'right'}, [
-      h('a', {href: 'https://github.com/evbogue/bogbook'}, ['github']),
-      h('code', [' or ']),
-      h('a', {href: 'https://git.sr.ht/~ev/bogbookv3'}, ['sr.ht'])
+  const navbar = h('div', {classList: 'navbar navbar-fixed-top'})
+  const internal = h('div', {classList: 'navbar-inner'}, [
+    h('ul', {classList: 'nav'}, [
+
+      h('li', [getBoth(keys.pubkey())]),
+      h('li', [h('a', {href: '#'}, ['Home'])]),
+      h('li', [h('a', {href: '#key'}, ['Key'])])
     ])
   ])
   navbar.appendChild(internal)
+
+  return navbar
 }

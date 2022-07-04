@@ -6,7 +6,7 @@ import { keyroute } from './routes/key.js'
 
 const kv = new IdbKvStore('bogbook3')
 
-export const welcome = h('div', {id: 'scroller'})
+export const welcome = h('div', {id: 'scroller', classList: 'row span8 offset1'})
 
 function genkey (brute) {
   let keygen = '@/'
@@ -20,14 +20,15 @@ function genkey (brute) {
       }
 
       const keymessage = h('div', {classList:'message'}, [
-        h('div', [getImage(keygen.substring(0, 44)), ' ', getName(keygen.substring(0, 44))]),
-        h('div', [keygen]),
+        h('p', [getImage(keygen.substring(0, 44)), ' ', getName(keygen.substring(0, 44))]),
+        h('p', [h('pre', [keygen])]),
         h('button', {
+          classList: 'btn btn-primary',
           onclick: function () {
             kv.set('keypair', keygen).then(done => {
               location.reload()
             })
-            alert('Hold onto your keypair to maintain the same identity!\n\n' + keygen)
+            alert('Hold on to your keypair to maintain the same identity!\n\n' + keygen)
           }
         }, ['Choose this keypair'])
       ])
@@ -43,17 +44,19 @@ function genkey (brute) {
   }
 }
 
-const input = h('input', {placeholder: 'Try for a key that starts with...'})
+const input = h('input', {type: 'text', placeholder: 'Try for a key that starts with...'})
 
 let interval
 
 const importKey = h('button', {
+  classList: 'btn btn-success',
   onclick: function () {
     keyroute(welcome)
   }
 }, ['Import'])
 
 const stop = h('button', {
+  classList: 'btn',
   onclick: function () {
     stop.parentNode.replaceChild(button, stop)
     clearInterval(interval)
@@ -61,6 +64,7 @@ const stop = h('button', {
 }, ['Stop'])
 
 const button = h('button', {
+  classList: 'btn btn-info',
   onclick: function () {
     button.parentNode.replaceChild(stop, button)
     interval = setInterval(function () {
@@ -77,7 +81,7 @@ const intro = h('div', {classList: 'message'}, [
   importKey,
   button,
   input
-  ])
+])
 
 welcome.appendChild(intro)
 

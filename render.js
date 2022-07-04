@@ -24,7 +24,7 @@ export async function render (msg) {
   if (msg.previous != msg.hash) {
     merklenav.appendChild(h('a', {href: '#' + msg.previous}, ['prev']))
   } else {
-    merklenav.appendChild(h('code', ['root']))
+    merklenav.appendChild(h('span', ['root']))
   }
  
   message.appendChild(h('span', {classList: 'right'}, [
@@ -37,11 +37,11 @@ export async function render (msg) {
 
   message.appendChild(getBoth(msg.author))
 
-  const reply = h('button', {onclick: function () {
+  const reply = h('button', {classList: 'btn', onclick: function () {
     const getReply = document.getElementById('reply:' + src)
     if (!getReply) {
       const replybox = h('div', {id: 'reply:' + src, classList: 'message'}, [
-        h('span', {classList: 'right'}, ['Preview']),
+        h('code', {classList: 'right'}, ['Preview']),
         getBoth(keys.pubkey()),
         composer(msg)
       ])
@@ -101,7 +101,6 @@ export async function render (msg) {
   }
 
   getData(msg.data, content)
-
   message.appendChild(content)
   message.appendChild(reply)
 
