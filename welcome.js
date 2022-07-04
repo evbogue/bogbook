@@ -6,7 +6,7 @@ import { keyroute } from './routes/key.js'
 
 const kv = new IdbKvStore('bogbook3')
 
-export const welcome = h('div', {id: 'scroller', classList: 'row span8 offset1'})
+export const welcome = h('div', {id: 'scroller', classList: 'row span8 offset2'})
 
 function genkey (brute) {
   let keygen = '@/'
