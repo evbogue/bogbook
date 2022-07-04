@@ -18,8 +18,12 @@ function getContacts (textarea, preview) {
 
       logs.getFeeds().then(feeds => {
         feeds.map(feed => {
-          addrs.appendChild(h('button', {classList: 'right btn', onclick: function () {
-            kv.get('name:' + feed).then(name => {
+          addrs.appendChild(h('button', {classList: 'btn', onclick: function () {
+            kv.get('name:' + feed).then(got => {
+              let name = feed.substring(0, 7) + '...'
+              if (got) {
+                name = got
+              }
               if (textarea.selectionStart || textarea.selectionEnd) {
                 textarea.value = textarea.value.substring(0, textarea.selectionStart)
                   + ' [' + name + '](' + feed + ') ' +
@@ -29,7 +33,7 @@ function getContacts (textarea, preview) {
               }
               preview.innerHTML = marked(textarea.value)
             })
-          }}, [getImage(feed), getName(feed)]))
+          }}, [getImage(feed), ' ', getName(feed)]))
         })
       })
     } else {
