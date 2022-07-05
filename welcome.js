@@ -44,7 +44,7 @@ function genkey (brute) {
   }
 }
 
-const input = h('input', {type: 'text', placeholder: 'Try for a key that starts with...'})
+const input = h('input', {type: 'text', classList: 'input-large', style:'padding: 4px 6px; height: auto; margin-bottom: 0px;', placeholder: 'Try for a key that starts with...'})
 
 let interval
 
@@ -73,16 +73,26 @@ const button = h('button', {
   }
 }, ['Generate'])
 
+const about = h('div', {classList: 'hero-unit'}, [
+  h('h1', [window.location.host]),
+  h('img', {style: 'width: 100%', src:'./example.png', classList: 'img-polaroid'}),
+  h('hr'),
+  h('p', {innerHTML:'This is an instance of Bogbook, a distributed social network of secure hashchains. When you publish messages they are signed using ed25519 public key cryptography and relayed via Deno servers.</p><p>This instance is hosted on <a href="https://deno.com/">Deno Deploy</a>.</p></p>Read the code at <a href="https://github.com/evbogue/bogbook/">Github</a> or <a href="https://git.sr.ht/~ev/bogbookv3/">SourceHut</a>.'}),
+  h('button', {classList: 'btn btn-large btn-primary', onclick: function () {
+    about.parentNode.removeChild(about)
+    welcome.appendChild(intro)
+  }}, ['Get Started!'])
+])
+
 const intro = h('div', {classList: 'message'}, [
-  'Hello! You have not generated an ed25519 keypair yet. To use this distributed social network you will need a keypair. Hold onto it to continue to use the same identity.',
-  h('br'),
-  'Press generate to begin generating keypairs. When you see a keypair you want, press stop and select that keypair.',
-  h('br'),
+  h('h1', ['Get started']),
+  h('p', ['You have not generated an ed25519 keypair yet. To use this distributed social network you will need a keypair. Hold onto it to continue to use the same identity.']),
+  h('p', ['Press generate to begin generating keypairs. When you see a keypair you want, press stop and select that keypair.']),
   importKey,
   button,
   input
 ])
 
-welcome.appendChild(intro)
+welcome.appendChild(about)
 
 

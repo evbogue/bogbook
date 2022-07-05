@@ -2,6 +2,8 @@
 
 ### A replicated and secure social network made from ed25519 hash chains
 
+![example](./example.png)
+
 This is my third attempt at making a distributed social network, the big difference between Bogbook v3 and Bogbook v2 is that I stopped using append-only logs, and now we are using a hash chain with no sequence order. 
 
 The benefits of this are:
