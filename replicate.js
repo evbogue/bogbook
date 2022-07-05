@@ -7,6 +7,17 @@ import { encode } from './lib/base64.js'
 import { getBoth } from './avatar.js'
 import { h } from './lib/misc.js'
 
+let notifyqueue = false
+
+setInterval(function () {
+  if (notifyqueue) {
+    if (Notification.permission === "granted") {
+      const notification = new Notification(notifyqueue)
+      notifyqueue = false
+    }
+  }
+}, 10000)
+
 const peers = new Map()
 
 const kv = new IdbKvStore('drafts')
@@ -249,9 +260,13 @@ function processReq (req, ws) {
               if (!getMsg) {
                 const scroller = document.getElementById('scroller')
                 render(opened).then(rendered => {
-                  if (Notification.permission === "granted") {
-                    const notification = new Notification(opened.author.substring(0, 5) + ': ' + opened.text)
-                  }
+                    if (opened.text) {
+                      notifyqueue = opened.author.substring(0, 5) + ': ' + opened.text
+                    } else {
+                      setTimout(function () {
+                        notifyqueue = opened.author.substring(0, 5) + ': ' + opened.text
+                      }, 1000)
+                    }
 
                   // check if a message already has this as previous, then see if we can find that message on the screen and insert the message underneath it. If we cannot find the message on the screen, then append at the bottom of the scroller. If we do not have a message that contains the previous then we put it at the top because it should be new.
                   logs.getNext(opened.hash).then(next => {
