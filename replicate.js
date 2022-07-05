@@ -189,11 +189,9 @@ function processReq (req, ws) {
       ])
       scroller.insertBefore(connect, scroller.childNodes[1])
       if (req.substring(8) != keys.pubkey()) {
-        setTimeout(function () {
-          if (Notification.permission === "granted") {
-            const notification = new Notification(req.substring(8, 13) + ' connected.')
-          }
-        }, 5000)
+        if (Notification.permission === "granted") {
+          const notification = new Notification(req.substring(8, 13) + ' connected.')
+        }
       }
     }
     else if (req.startsWith('disconnect:')) {
