@@ -29,9 +29,9 @@ Generate a keypair, and then post a message!
 
 ...
 
-or try it online! http://bogbook.com/
+or try it online! https://bogbook.com/ or https://denobook.com/
 
-Visit my profile page [here](http://bogbook.com/#e+2bu3W0KeR00URX75mVtFsFrTgTfAW2R3+F9W+s324=) and say hello!
+Visit my profile page [here](https://denobook.com/#ELwPcMFe0kRF9luXO7qDSKXsiCOuQR27JT23L3gz3AE=) to sync my posts and say hello!
 
 ### How it works
 
