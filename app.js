@@ -4,6 +4,7 @@ import { route } from './route.js'
 import { welcome } from './welcome.js'
 import { connect } from './replicate.js'
 import { h } from './lib/misc.js' 
+import { logs } from './logs.js' 
 
 if (!window.location.hash) { window.location = '#' }
 
@@ -29,7 +30,7 @@ function start () {
     container.appendChild(navbar())
     route(container)
   } else {
-    setTimeout(function () { start() }, 1500)
+    setTimeout(function () { start() }, 5000)
   }
 }
 
