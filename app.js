@@ -4,7 +4,7 @@ import { route } from './route.js'
 import { welcome } from './welcome.js'
 import { connect } from './replicate.js'
 import { h } from './lib/misc.js' 
-import { logs } from './logs.js' 
+import { logs } from './browserlog.js' 
 
 if (!window.location.hash) { window.location = '#' }
 
