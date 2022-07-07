@@ -5,6 +5,8 @@ import { publish, open } from './sbog.js'
 import { render } from './render.js'
 import { logs, save } from './browserlog.js'
 import { make, find } from './inpfs.js'
+import { cache} from './cache.js'
+
 
 const kv = new IdbKvStore('drafts')
 
@@ -16,11 +18,11 @@ export function getImage (id) {
     if (querylog && querylog[0]) {
       querylog.forEach(msg => {
         if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
-          find(msg.text.substring(6,50)).then(data => {
+          cache.get(msg.text.subtring(6,50)).then(data) {
             if (data) {
               img.src = data
             }
-          })
+          }
         }
       })
     }
@@ -35,7 +37,7 @@ export function getName (id) {
     if (querylog && querylog[0]) {
       querylog.forEach(msg => {
         if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
-          find(msg.text.substring(5,49)).then(data => {
+          cache.get(msg.text.substring(5,49)).then(data => {
             if (data) {
               nameDiv.textContent = data
               kv.set('name:' + id, data)
