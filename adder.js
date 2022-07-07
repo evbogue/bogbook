@@ -19,7 +19,6 @@ export function adder (log, src, div) {
     addPosts(posts, div).then(done => {
       index = index + 25
       window.onscroll = function (ev) {
-        console.log(src)
         if (
           ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 1000)
           && window.location.hash.substring(1) === src

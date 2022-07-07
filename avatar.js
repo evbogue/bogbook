@@ -5,10 +5,17 @@ import { publish, open } from './sbog.js'
 import { render } from './render.js'
 import { logs, save } from './browserlog.js'
 import { make, find } from './inpfs.js'
-import { cache} from './cache.js'
 
+const cache = new Map()
 
-const kv = new IdbKvStore('drafts')
+export function plainTextName (id) {
+  const got = cache.get(id)
+  if (got) {
+    return got
+  } else {
+    return id.substring(0, 10) + '...'
+  }
+}
 
 export function getImage (id) {
   let img = vb(decode(id), 256)
@@ -18,10 +25,17 @@ export function getImage (id) {
     if (querylog && querylog[0]) {
       querylog.forEach(msg => {
         if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
-          cache.get(msg.text.subtring(6,50)).then(data) {
-            if (data) {
-              img.src = data
-            }
+          const query = msg.text.substring(6,50)
+          const got = cache.get(query)
+          if (got) {
+            img.src = got
+          } else {
+            find(query).then(image => {
+              if (image) {
+                cache.set(query, image)
+                img.src = image
+              }
+            })
           }
         }
       })
@@ -37,12 +51,16 @@ export function getName (id) {
     if (querylog && querylog[0]) {
       querylog.forEach(msg => {
         if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
-          cache.get(msg.text.substring(5,49)).then(data => {
-            if (data) {
-              nameDiv.textContent = data
-              kv.set('name:' + id, data)
-            }
-          })
+          const query = msg.text.substring(5, 49)
+          const got = cache.get(query)
+          if (got) {
+            nameDiv.textContent = got 
+          } else {
+            find(query).then(name => {
+              cache.set(query, name)
+              nameDiv.textContent = name 
+            })
+          }
         }
       })
     }
