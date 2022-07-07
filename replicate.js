@@ -261,7 +261,7 @@ function processReq (req, ws) {
                     if (opened.text) {
                       notifyqueue = opened.author.substring(0, 5) + ': ' + opened.text
                     } else {
-                      setTimout(function () {
+                      setTimeout(function () {
                         notifyqueue = opened.author.substring(0, 5) + ': ' + opened.text
                       }, 1000)
                     }
