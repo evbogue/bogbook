@@ -1,4 +1,5 @@
 import { h } from './lib/misc.js'
+import { cache } from './cache.js'
 
 const renderer = new marked.Renderer()
 
@@ -57,9 +58,9 @@ renderer.link = function (href, title, text) {
 
 renderer.image = function (src, unknown, title) {
   if (src.length === 44) {
-    //const image = cache.get(src)
+    const image = cache.get(src)
     if (image) {
-      return '<div><img src="' + image + '" title="' + title + '" class="thumb" /></div>'
+      return '<div><img src="' + image + '" title="' + title + '" class="img-polaroid thumb" /></div>'
     } else { return ''}
   }
 }

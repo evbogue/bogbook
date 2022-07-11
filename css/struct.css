@@ -52,4 +52,9 @@ textarea {
   object-fit: cover;
 }
 
+.thumb { 
+  width: 100%;
+  max-width: 100%; 
+}
+
 .right { float: right;}

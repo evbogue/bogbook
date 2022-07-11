@@ -26,7 +26,7 @@ export async function find (inpns) {
   }
   setTimeout(function () {
     if (!file) {
-      console.log('WE DONT HAVE THE FILE')
+      console.log('WE DONT HAVE ' + inpns)
       blast(inpns)
       //return null
     }
