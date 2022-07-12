@@ -18,7 +18,7 @@ async function getLatest (query) {
 
 function processReq (req, ws) {
   if (req.length === 44) {
-    console.log('REQ:' + req)
+    //console.log('REQ:' + req)
     let got = false
     if (msgstore.has(req)) {
       const msg = msgstore.get(req)
@@ -60,7 +60,7 @@ function processReq (req, ws) {
         crypto.subtle.digest("SHA-256", new TextEncoder().encode(file)).then(digest => {
           const verify = encode(digest)
           if (hash === verify) {
-            console.log('Added blob: ' + hash)
+            //console.log('Added blob: ' + hash)
             blobstore.set(hash, file)
           }
         })
@@ -70,7 +70,7 @@ function processReq (req, ws) {
         if (!blobstore.has(opened.data)) {
           ws.send(opened.data)
         }
-        console.log(opened)
+        //console.log(opened)
         if (!msgstore.has(opened.hash)) {
           console.log('Added post: ' + opened.hash)
           msgstore.set(opened.hash, opened)
@@ -125,4 +125,4 @@ export function connect (server) {
   }
 }
 
-connect('ws://localhost:8080/ws')
+connect('wss://denobook.com/ws')
