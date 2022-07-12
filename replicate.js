@@ -20,111 +20,39 @@ setInterval(function () {
 
 const peers = new Map()
 
-const kv = new IdbKvStore('drafts')
-
-let blastcache = []
-let times = 0
-
-setTimeout(function () {
-  blastcache.forEach(value => {
-    blast(value)
-  })
-  times++
-  if (times > 5) {
-    blastcache = []
-    times = 0
-  }
-}, 10000)
-
 export function blast (msg) {
-  //console.log('BLASTING')
-  //console.log(msg)
-  //console.log('BLAST:' + msg)
-  //console.log(peers)
   for (const peer of peers.values()) {
-    if (!blastcache.includes(msg)) {
-      //console.log(msg)
-      blastcache.push(msg)
-      peer.send(msg)
-    } 
+    peer.send(msg)
   }
 }
 
 function replicate (ws) {
-  // first check for my feed
+  // rec our latest
   ws.send(keys.pubkey())
-  logs.getLatest(keys.pubkey()).then(latest => {
-    if (latest) {
-      logs.get(latest.hash).then(msg => {
-        ws.send(msg.raw)
-      })
-    }
-  })
-  //logs.getLatest(keys.pubkey()).then(latest => {
-  //  if (latest) {
-  //    ws.send(keys.pubkey())
-  //  } else if (!blastcache.includes(keys.pubkey())) {
-  //    blastcache.push(keys.pubkey())
-  //    ws.send(keys.pubkey())
-  //  }
-  //})
 
+  logs.getFeeds().then(feedList => {
+    //console.log(feedList)
+    feedList.forEach(feed => {
+      ws.send(feed)
+      logs.getLatest(feed).then(latest => {
+        ws.send(latest.raw)
+      })
+    })
+  })
+ 
   // next check for the route feed
   var src = window.location.hash.substring(1)
+
   if (src.length === 44) {
     //console.log('checking for route feed' + src)
     logs.query(src).then(query => {
-      if (!query && !blastcache.includes(src)) {
-        //console.log('we do not have ' + query)
-        blastcache.push(src)
-        ws.send(src)  
+      if (!query[0]) {
+        ws.send(src)
       }
     })
-  } 
-
-  let timer
-
-  function start () {
-    timer = setInterval(function () {
-      logs.getFeeds().then(feeds => {
-        //console.log(feeds)
-        if (feeds[0]) {
-          feeds.map(feed => {
-            logs.getLatest(feed).then(latest => {
-              //console.log(feed + latest)
-              ws.send('update:' + feed + latest.hash)
-            })
-          })
-        }
-      }) 
-      //const feeds = []
-      //logs.getLog().then(log => {
-      //  for (let i = log.length - 1; i >= 0 ; i--) {
-      //    if (!feeds.includes(log[i].author)) {
-      //      feeds.push(log[i].author)
-      //    }
-      //    if (i === 0 && feeds[0]) {
-      //      feeds.forEach(feed => {
-      //        logs.getLatest(feed).then(latest => {
-      //          console.log(latest)
-      //          ws.send(latest)
-      //          //console.log('make sure server has latest: ' + latest)
-      //        })
-      //        //console.log('asking for latest: ' + feed)
-      //        console.log(feed)
-      //        ws.send(feed)
-      //      })
-      //    }
-      //  }
-      //})
-    }, 10000)
   }
 
-  start()
-
-  // if connection closes we clear the timer and try to reconnect
   ws.onclose = (e) => {
-    clearInterval(timer)
     setTimeout(function () {
       console.log('connection to ' + ws.url + ' closed, reconnecting')
       connect(ws.url, keys)
@@ -140,6 +68,11 @@ function processReq (req, ws) {
     if (req === keys.pubkey()) {
       gotit = true
     }
+    logs.getFeeds().then(feeds => {
+      if (feeds.includes(req)) {
+        gotit = true
+      }
+    }) 
     //console.log('check to see if '+ req + ' is a feed')
     logs.getLatest(req).then(latest => {
       if (latest) {
@@ -160,20 +93,22 @@ function processReq (req, ws) {
         })
       }
     })
-    if (!gotit) {
-      find(req).then(file => {
-        if (file) {
-          gotit = true
-          //console.log(req + ' is a blob, sending')
-          //console.log(file)
-          ws.send('blob:' + req + file)
-        }
-      })
-    }
     setTimeout(function () {
       if (!gotit) {
-        //console.log('WE do not have '+ req +', blasting for it ')
-        blast(req)
+        find(req).then(file => {
+          if (file) {
+            gotit = true
+            //console.log(req + ' is a blob, sending')
+            //console.log(file)
+            ws.send('blob:' + req + file)
+            setTimeout(function () {
+              if (!gotit) {
+                //console.log('WE do not have '+ req +', blasting for it ')
+                blast(req)
+              }
+            }, 1000)
+          }
+        })
       }
     }, 1000)
   } 
@@ -193,6 +128,15 @@ function processReq (req, ws) {
           const notification = new Notification(req.substring(8, 13) + ' connected.')
         }
       }
+      logs.getFeeds().then(feedList => {
+        feedList.forEach(feed => {
+          ws.send(feed)
+          logs.getLatest(feed).then(latest => {
+            ws.send(latest.raw)
+          })
+        })
+      })
+
     }
     else if (req.startsWith('disconnect:')) {
       console.log(req)
@@ -211,35 +155,40 @@ function processReq (req, ws) {
         }
       }
 
-    }
-    else if (req.startsWith('update')) {
-      //console.log(req)
-      const feedID = req.substring(7, 51)
-      const latestMsg = req.substring(51)
-      //console.log(feedID)
-      //console.log(latestMsg)
-      logs.getFeeds().then(feeds => {
-        //console.log(feeds)
-        feeds.map(feed => {
-          if (feed === feedID) {
-            logs.getLatest(feedID).then(latest => {
-              //console.log(feedID + ' is at ' + latest.hash)
-              if (latest.hash != latestMsg) {
-                //console.log('Sending latest of ' + latest.author + ' to ' + ws.pubkey)
-                ws.send(latest.raw)
-              }
-            })
-          }
-        })
-      })
+    //}
+    //else if (req.startsWith('update')) {
+    //  //console.log(req)
+    //  const feedID = req.substring(7, 51)
+    //  const latestMsg = req.substring(51)
+    //  //console.log(feedID)
+    //  //console.log(latestMsg)
+    //  logs.getFeeds().then(feeds => {
+    //    //console.log(feeds)
+    //    feeds.map(feed => {
+    //      if (feed === feedID) {
+    //        logs.getLatest(feedID).then(latest => {
+    //          //console.log(feedID + ' is at ' + latest.hash)
+    //          if (latest.hash != latestMsg) {
+    //            //console.log('Sending latest of ' + latest.author + ' to ' + ws.pubkey)
+    //            ws.send(latest.raw)
+    //          }
+    //        })
+    //      }
+    //    })
+    //  })
     } else if (req.startsWith('blob')) {
-      //console.log('THIS IS A BLOB')
+      console.log('THIS IS A BLOB')
       const hash = req.substring(5, 49)
-      const file = req.substring(49)
-      const verify = encode(sha256(new TextEncoder().encode(file)))
-      if (hash == verify) {
-        make(file)
-      }
+      find(hash).then(found => {
+        if (!found) {
+          console.log('WE DO NOT HAVE THE BLOB')
+          const file = req.substring(49)
+          const verify = encode(sha256(new TextEncoder().encode(file)))
+          if (hash == verify) {
+            make(file)
+          }
+        }
+      })
     } else {
       open(req).then(opened => {
         if (opened) {
