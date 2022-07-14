@@ -114,6 +114,7 @@ export const logs = function logs (query) {
           newData = true
           save()
           blast(opened.hash)
+          blast(opened.data)
         }
       })
     }

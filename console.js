@@ -1,6 +1,7 @@
 import { keys} from './keys.js'
 import { encode, decode } from './lib/base64.js'
 import { open } from './denobog.js'
+import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
 
 const msgstore = new Map() 
 const blobstore = new Map()
@@ -22,29 +23,29 @@ function processReq (req, ws) {
     let got = false
     if (msgstore.has(req)) {
       const msg = msgstore.get(req)
-      ws.send(msg.raw)
+      gossipMsg(msg.raw)
       if (blobstore.has(msg.data)) {
         const data = blobstore.get(msg.data)
-        ws.send('blob:' + req + data)
+        gossipMsg('blob:' + req + data)
       } else {
-        ws.send(msg.data)
+        gossipMsg(msg.data)
       }
       got = true
     }
     if (blobstore.has(req)) {
       const data = blobstore.get(req)
-      ws.send('blob:' + req + data)
+      gossipMsg('blob:' + req + data)
       got = true
     } 
     if (!got) {
       getLatest(req).then(msg => {
         if (msg) {
-          ws.send(msg.raw)
+          gossipMsg(msg.raw)
           if (blobstore.has(msg.data)) {
             const data = blobstore.get(msg.data)
-            ws.send('blob:' + req + data)
+            gossipMsg('blob:' + req + data)
           } else {
-            ws.send(msg.data)
+            gossipMsg(msg.data)
           }
         }
       })
@@ -68,7 +69,7 @@ function processReq (req, ws) {
     } else {
       open(req).then(opened => {
         if (!blobstore.has(opened.data)) {
-          ws.send(opened.data)
+          gossipMsg(opened.data)
         }
         //console.log(opened)
         if (!msgstore.has(opened.hash)) {
@@ -77,7 +78,7 @@ function processReq (req, ws) {
           log.push(opened)
         }
         if (!msgstore.has(opened.previous)) {
-          ws.send(opened.previous)
+          gossipMsg(opened.previous)
         }
       })
     }
@@ -93,13 +94,15 @@ export function connect (server) {
   ws.binaryType = 'arraybuffer'
 
   ws.onopen = () => {
-    sockets.add(ws)
+    addSocket(ws)
     ws.send('connect:' + keys.pubkey())
   }
 
   ws.onmessage = (msg) => {
     //console.log(msg.data)
-    processReq(msg.data, ws)
+    if (!queue.includes(msg.data)) {
+      processReq(msg.data, ws)
+    }
   }
 
   Deno.addSignalListener("SIGINT", () => {
@@ -108,7 +111,7 @@ export function connect (server) {
   })
 
   ws.onclose = (e) => {
-    sockets.delete(ws)
+    rmSocket(ws)
     setTimeout(function () {
       connect(server)
     }, 1000)
@@ -119,10 +122,11 @@ export function connect (server) {
   ws.onerror = (err) => {
     setTimeout(function () {
       ws.close()
-      sockets.delete(ws)
+      rmSocket(ws)
       retryCount++
     }, 10000 * retryCount)
   }
 }
 
-connect('wss://denobook.com/ws')
+//connect('wss://denobook.com/ws')
+connect('ws://localhost:8080/ws')

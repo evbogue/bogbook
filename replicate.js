@@ -6,6 +6,7 @@ import { make, find } from './inpfs.js'
 import { encode } from './lib/base64.js'
 import { getBoth } from './avatar.js'
 import { h } from './lib/misc.js'
+import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
 
 let notifyqueue = false
 
@@ -18,24 +19,25 @@ setInterval(function () {
   }
 }, 10000)
 
-const peers = new Map()
+//const peers = new Map()
 
 export function blast (msg) {
-  for (const peer of peers.values()) {
-    peer.send(msg)
-  }
+  gossipMsg(msg)
+  //for (const peer of peers.values()) {
+  //  peer.send(msg)
+  //}
 }
 
 function replicate (ws) {
   // rec our latest
-  ws.send(keys.pubkey())
+  gossipMsg(keys.pubkey())
 
   logs.getFeeds().then(feedList => {
     //console.log(feedList)
     feedList.forEach(feed => {
-      ws.send(feed)
+      gossipMsg(feed)
       logs.getLatest(feed).then(latest => {
-        ws.send(latest.raw)
+        gossipMsg(latest.raw)
       })
     })
   })
@@ -47,7 +49,7 @@ function replicate (ws) {
     //console.log('checking for route feed' + src)
     logs.query(src).then(query => {
       if (!query[0]) {
-        ws.send(src)
+        gossipMsg(src)
       }
     })
   }
@@ -60,7 +62,7 @@ function replicate (ws) {
   }
 }
 
-let serverId = 0
+//let serverId = 0
 
 function processReq (req, ws) {
   if (req.length === 44) {
@@ -80,7 +82,7 @@ function processReq (req, ws) {
         logs.get(latest.hash).then(got => {
           if (got) {
             gotit = true
-            ws.send(got.hash)
+            gossipMsg(got.hash)
           }
         })
       } else {
@@ -88,7 +90,7 @@ function processReq (req, ws) {
           if (post) {
             gotit = true
             //console.log(req + ' is a post, sending')
-            ws.send(post.raw)
+            gossipMsg(post.raw)
           } 
         })
       }
@@ -100,7 +102,7 @@ function processReq (req, ws) {
             gotit = true
             //console.log(req + ' is a blob, sending')
             //console.log(file)
-            ws.send('blob:' + req + file)
+            gossipMsg('blob:' + req + file)
             setTimeout(function () {
               if (!gotit) {
                 //console.log('WE do not have '+ req +', blasting for it ')
@@ -130,15 +132,13 @@ function processReq (req, ws) {
       }
       logs.getFeeds().then(feedList => {
         feedList.forEach(feed => {
-          ws.send(feed)
+          gossipMsg(feed)
           logs.getLatest(feed).then(latest => {
-            ws.send(latest.raw)
+            gossipMsg(latest.raw)
           })
         })
       })
-
-    }
-    else if (req.startsWith('disconnect:')) {
+    } else if (req.startsWith('disconnect:')) {
       console.log(req)
       const disgot = document.getElementById(req)
       if (disgot) { got.parentNode.removeChild(disgot) }
@@ -154,28 +154,6 @@ function processReq (req, ws) {
           const notification = new Notification(req.substring(11, 18) + ' disconnected.')
         }
       }
-
-    //}
-    //else if (req.startsWith('update')) {
-    //  //console.log(req)
-    //  const feedID = req.substring(7, 51)
-    //  const latestMsg = req.substring(51)
-    //  //console.log(feedID)
-    //  //console.log(latestMsg)
-    //  logs.getFeeds().then(feeds => {
-    //    //console.log(feeds)
-    //    feeds.map(feed => {
-    //      if (feed === feedID) {
-    //        logs.getLatest(feedID).then(latest => {
-    //          //console.log(feedID + ' is at ' + latest.hash)
-    //          if (latest.hash != latestMsg) {
-    //            //console.log('Sending latest of ' + latest.author + ' to ' + ws.pubkey)
-    //            ws.send(latest.raw)
-    //          }
-    //        })
-    //      }
-    //    })
-    //  })
     } else if (req.startsWith('blob')) {
       console.log('THIS IS A BLOB')
       const hash = req.substring(5, 49)
@@ -241,22 +219,20 @@ function processReq (req, ws) {
 }
 
 export function connect (server) {
-  const id = ++serverId
-
   console.log('Connecting to ' + server)
   const ws = new WebSocket(server)
   ws.binaryType = 'arraybuffer'
 
   ws.onopen = () => {
     ws.send('connect:' + keys.pubkey())
-    peers.set(id, ws)
-    //setTimeout(function () {
-      replicate(ws)
-    //}, 1000)
+    addSocket(ws)
+    replicate(ws)
   }
   
   ws.onmessage = (msg) => {
-    processReq(msg.data, ws)
+    if (!queue.includes(msg.data)) {
+      processReq(msg.data, ws)
+    }
   }
 
   addEventListener('beforeunload', event => { 
@@ -264,7 +240,7 @@ export function connect (server) {
   })
 
   ws.onclose = (e) => {
-    peers.delete(id)
+    rmSocket(ws)
     setTimeout(function () {
       connect(server)
     }, 1000)
@@ -275,7 +251,7 @@ export function connect (server) {
   ws.onerror = (err) => {
     setTimeout(function () {
       ws.close()
-      peers.delete(id)
+      rmSocket(ws)
       retryCount++
     }, 10000 * retryCount)
   }

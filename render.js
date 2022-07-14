@@ -90,11 +90,11 @@ export async function render (msg) {
     find(hash).then(data => {
       if (data) {
         contentRender(data, content)
-      } else if (retries < 50) {
-        retries++
+      } else if (retries < 5) {
+        blast(hash)
         setTimeout(function () {
           getData(hash, content)
-        }, 1000 * retries)
+        }, 5000 * retries)
       }
     })
   }
