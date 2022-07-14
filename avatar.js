@@ -29,8 +29,7 @@ export function getImage (id) {
   } else {
     logs.query(id).then(querylog => {
       if (querylog && querylog[0]) {
-        const reverse = querylog.slice().reverse()
-        reverse.forEach(msg => {
+        querylog.forEach(msg => {
           if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
             const query = msg.text.substring(6,50)
             find(query).then(image => {
@@ -56,8 +55,7 @@ export function getName (id) {
   } else {
     logs.query(id).then(querylog => {
       if (querylog && querylog[0]) {
-        const reverse = querylog.slice().reverse()
-        reverse.forEach(msg => {
+        querylog.forEach(msg => {
           if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
             const query = msg.text.substring(5, 49)
             find(query).then(name => {
