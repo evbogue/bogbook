@@ -6,9 +6,14 @@ import { render } from './render.js'
 import { logs, save } from './browserlog.js'
 import { make, find } from './inpfs.js'
 
-const imagecache = new Map()
+let imagecache = new Map()
 
-const namecache = new Map()
+let namecache = new Map()
+
+setInterval(function () {
+  imagecache.clear() 
+  namecache.clear() 
+}, 10000)
 
 export function plainTextName (id) {
   const got = namecache.get(id)
@@ -30,14 +35,17 @@ export function getImage (id) {
     logs.query(id).then(querylog => {
       if (querylog && querylog[0]) {
         querylog.forEach(msg => {
-          if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
-            const query = msg.text.substring(6,50)
-            find(query).then(image => {
-              if (image) {
-                imagecache.set(id, image)
-                img.src = image
-              }
-            })
+          if (!imagecache.has(id)) {
+
+            if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
+              const query = msg.text.substring(6,50)
+              find(query).then(image => {
+                if (image) {
+                  imagecache.set(id, image)
+                  img.src = image
+                }
+              })
+            }
           }
         })
       }
@@ -56,12 +64,14 @@ export function getName (id) {
     logs.query(id).then(querylog => {
       if (querylog && querylog[0]) {
         querylog.forEach(msg => {
-          if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
-            const query = msg.text.substring(5, 49)
-            find(query).then(name => {
-              namecache.set(id, name)
-              nameDiv.textContent = name 
-            })
+          if (!namecache.has(id)) {
+            if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
+              const query = msg.text.substring(5, 49)
+              find(query).then(name => {
+                namecache.set(id, name)
+                nameDiv.textContent = name 
+              })
+            }
           }
         })
       }
