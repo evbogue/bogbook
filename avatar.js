@@ -6,10 +6,12 @@ import { render } from './render.js'
 import { logs, save } from './browserlog.js'
 import { make, find } from './inpfs.js'
 
-const cache = new Map()
+const imagecache = new Map()
+
+const namecache = new Map()
 
 export function plainTextName (id) {
-  const got = cache.get(id)
+  const got = namecache.get(id)
   if (got) {
     return got
   } else {
@@ -21,50 +23,50 @@ export function getImage (id) {
   let img = vb(decode(id), 256)
   img.classList = 'avatar img-rounded'
 
-  logs.query(id).then(querylog => {
-    if (querylog && querylog[0]) {
-      querylog.forEach(msg => {
-        if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
-          const query = msg.text.substring(6,50)
-          const got = cache.get(query)
-          if (got) {
-            img.src = got
-          } else {
+  if (imagecache.has(id)) {
+    const got = imagecache.get(id)
+    img.src = got
+  } else {
+    logs.query(id).then(querylog => {
+      if (querylog && querylog[0]) {
+        querylog.forEach(msg => {
+          if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
+            const query = msg.text.substring(6,50)
             find(query).then(image => {
               if (image) {
-                cache.set(query, image)
+                imagecache.set(id, image)
                 img.src = image
               }
             })
           }
-        }
-      })
-    }
-  })
+        })
+      }
+    })
+  }
   return img
 }
 
 export function getName (id) {
   const nameDiv = h('span')
   nameDiv.textContent = id.substring(0, 10) + '...'
-  logs.query(id).then(querylog => {
-    if (querylog && querylog[0]) {
-      querylog.forEach(msg => {
-        if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
-          const query = msg.text.substring(5, 49)
-          const got = cache.get(query)
-          if (got) {
-            nameDiv.textContent = got 
-          } else {
+  if (namecache.has(id)) {
+    const got = namecache.get(id)
+    nameDiv.textContent = got
+  } else {
+    logs.query(id).then(querylog => {
+      if (querylog && querylog[0]) {
+        querylog.forEach(msg => {
+          if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
+            const query = msg.text.substring(5, 49)
             find(query).then(name => {
-              cache.set(query, name)
+              namecache.set(id, name)
               nameDiv.textContent = name 
             })
           }
-        }
-      })
-    }
-  })
+        })
+      }
+    })
+  }
   return nameDiv
 }
 
