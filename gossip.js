@@ -8,7 +8,7 @@ export function gossipMsg (m) {
   if (!queue.includes(m) && !blastcache.includes(m)) {
     queue.unshift(m)
     blastcache.unshift(m)
-    console.log(m)
+    //console.log(m)
   } else {
     //console.log('caught in the blastcache!')
   }  
