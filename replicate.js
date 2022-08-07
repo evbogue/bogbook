@@ -10,6 +10,8 @@ import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
 
 let notifyqueue = false
 
+const blastcache = []
+
 setInterval(function () {
   if (notifyqueue) {
     if (Notification.permission === "granted") {
@@ -17,12 +19,16 @@ setInterval(function () {
       notifyqueue = false
     }
   }
+  blastcache = []
 }, 10000)
 
 //const peers = new Map()
 
 export function blast (msg) {
-  gossipMsg(msg)
+  if (!blastcache.includes(msg)) {
+    gossipMsg(msg)
+    blastcache.push(msg)
+  }
   //for (const peer of peers.values()) {
   //  peer.send(msg)
   //}

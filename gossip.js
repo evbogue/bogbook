@@ -2,10 +2,12 @@ const sockets = new Set()
 const outbox = new Map()
 
 export let queue = []
+let blastcache = []
 
 export function gossipMsg (m) {
-  if (!queue.includes(m)) {
+  if (!queue.includes(m) && !blastcache.includes(m)) {
     queue.unshift(m)
+    blastcache.unshift(m)
     console.log(m)
   } else {
     //console.log('caught in the blastcache!')
@@ -19,7 +21,11 @@ setInterval(function () {
     sockets.forEach(s => s.send(m))
     //console.log(queue.length)
   }
-}, 500)
+}, 150)
+
+setInterval(function () {
+  blastcache = []
+}, 10000)
 
 export function addSocket (s) {
   sockets.add(s)
