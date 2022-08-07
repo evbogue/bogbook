@@ -6,6 +6,7 @@ export let queue = []
 export function gossipMsg (m) {
   if (!queue.includes(m)) {
     queue.unshift(m)
+    console.log(m)
   } else {
     //console.log('caught in the blastcache!')
   }  

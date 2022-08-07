@@ -113,8 +113,8 @@ export const logs = function logs (query) {
           arraystore.push(opened)
           newData = true
           save()
-          blast(opened.hash)
-          blast(opened.data)
+          //blast(opened.hash)
+          //blast(opened.data)
         }
       })
     }

@@ -5,6 +5,7 @@ import { make, find } from './inpfs.js'
 import { save, logs } from './browserlog.js'
 import { render } from './render.js'
 import { getName, getImage, getBoth } from './avatar.js'
+import { blast } from './replicate.js'
 
 const kv = new IdbKvStore('drafts')
 
@@ -131,6 +132,8 @@ export function composer (msg) {
       if (textarea.value) {
         publish(textarea.value).then(published => {
           open(published).then(opened => {
+            blast(opened.raw)
+            //blast(opened.data)
             render(opened).then(rendered => {
               const getMsg = document.getElementById(msg.hash)
               if (getMsg) {
