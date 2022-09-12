@@ -3,17 +3,19 @@ import { blast } from './replicate.js'
 
 const kv = new IdbKvStore('bogbook3')
 
-const arraystore = []
+let arraystore = []
 
 var log = []
 
 export function save () {
   kv.set('log', log)
+  kv.set('arraystore', arraystore)
 }
 
 kv.get('log', function (err, file) {
   if (file) {
     log = file
+    arraystore = []
     log.map(msg => {
       open(msg).then(opened => {
         if (opened) {
@@ -21,7 +23,13 @@ kv.get('log', function (err, file) {
         }
       })
     })
-    //arraystore.sort((a,b) => a.timestamp - b.timestamp)
+  }
+})
+
+kv.get('arraystore', function (err, file) {
+  if (file) {
+    arraystore = file
+    arraystore.sort((a,b) => a.timestamp - b.timestamp)
   }
 })
 
@@ -30,7 +38,7 @@ let newData = true
 setInterval(function () {
   if (newData) {
     arraystore.sort((a,b) => a.timestamp - b.timestamp)
-    kv.set('log', log)
+    save()
     newData = false
   }
 }, 10000)
@@ -50,7 +58,7 @@ export const logs = function logs (query) {
       if (arraystore[0]) {
         const querylog = arraystore.filter(msg => msg.author == query)
         if (querylog[0]) {
-          querylog.sort((a,b) => a.timestamp - b.timestamp)
+          //querylog.sort((a,b) => a.timestamp - b.timestamp)
           return querylog[querylog.length - 1].hash
         }
       } 
@@ -67,18 +75,18 @@ export const logs = function logs (query) {
       return feeds
     },
     getLog: async function () {
-      arraystore.sort((a,b) => a.timestamp - b.timestamp)
+      //arraystore.sort((a,b) => a.timestamp - b.timestamp)
       return arraystore
     },
     query: async function (query) {
       if (arraystore[0]) {
         if (query.startsWith('?')) {
           const querylog = arraystore.filter(msg => msg.text && msg.text.includes(query.substring(1)))
-          querylog.sort((a,b) => a.timestamp - b.timestamp)
+          //querylog.sort((a,b) => a.timestamp - b.timestamp)
           return querylog 
         } else {
           const querylog = arraystore.filter(msg => msg.author == query || msg.hash == query)
-          querylog.sort((a,b) => a.timestamp - b.timestamp)
+          //querylog.sort((a,b) => a.timestamp - b.timestamp)
           return querylog 
         }
       }
