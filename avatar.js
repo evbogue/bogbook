@@ -26,7 +26,7 @@ export function plainTextName (id) {
 
 export function getImage (id) {
   let img = vb(decode(id), 256)
-  img.classList = 'avatar img-rounded'
+  img.classList = 'avatar'
 
   if (imagecache.has(id)) {
     const got = imagecache.get(id)
@@ -81,10 +81,10 @@ export function getName (id) {
 }
 
 export function getBoth (id) {
-  const both = h('a', {href: '#' + id}, [
-    getImage(id),
+  const both = h('span', [
+    h('a', {href: '#' + id}, [getImage(id)]),
     ' ',
-    getName(id)
+    h('a', {href: '#' + id}, [getName(id)])
   ])
   return both
 }

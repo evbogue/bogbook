@@ -1,5 +1,4 @@
 import { render } from './render.js' 
-import { logs } from './browserlog.js'
 import { open } from './sbog.js'
 
 async function addPosts (posts, div) {

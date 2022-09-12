@@ -6,7 +6,7 @@ import { keyroute } from './routes/key.js'
 
 const kv = new IdbKvStore('bogbook3')
 
-export const welcome = h('div', {id: 'scroller', classList: 'row span8 offset2'})
+export const welcome = h('div', {id: 'scroller'})
 
 function genkey (brute) {
   let keygen = '@/'
@@ -73,10 +73,9 @@ const button = h('button', {
   }
 }, ['Generate'])
 
-const about = h('div', {classList: 'hero-unit'}, [
+const about = h('div', {classList: 'message'}, [
   h('h1', [window.location.host]),
   h('img', {style: 'width: 100%', src:'./example.png', classList: 'img-polaroid'}),
-  h('hr'),
   h('p', {innerHTML:'This is an instance of Bogbook, a distributed social network of secure hashchains. When you publish messages they are signed using ed25519 public key cryptography and relayed via Deno servers.</p><p>This instance is hosted on <a href="https://deno.com/">Deno Deploy</a>.</p></p>Read the code at <a href="https://github.com/evbogue/bogbook/">Github</a> or <a href="https://git.sr.ht/~ev/bogbookv3/">SourceHut</a>.'}),
   h('button', {classList: 'btn btn-large btn-primary', onclick: function () {
     about.parentNode.removeChild(about)

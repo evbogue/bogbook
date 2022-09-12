@@ -127,7 +127,7 @@ function processReq (req, ws) {
       const got = document.getElementById(req)
       if (got) { got.parentNode.removeChild(got) }
       const connect = h('div', {classList: 'message', id: req}, [
-        h('a', {href: '#' + req.substring(8)}, [getBoth(req.substring(8))]),
+        getBoth(req.substring(8)),
         ' connected.'
       ])
       scroller.insertBefore(connect, scroller.childNodes[1])
@@ -151,7 +151,7 @@ function processReq (req, ws) {
       const got = document.getElementById('connect:' + req.substring(11))
       if (got) { got.parentNode.removeChild(got) }
       const disconnect = h('div', {classList: 'message', id: 'connect:' + req.substring(11)}, [
-        h('a', {href: '#' + req.substring(11)}, [getBoth(req.substring(11))]),
+        getBoth(req.substring(11)),
         ' disconnected.'
       ])
       scroller.insertBefore(disconnect, scroller.childNodes[1])

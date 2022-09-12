@@ -3,6 +3,53 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+p {
+  margin: 0;
+  padding-top: .5ex;
+  padding-bottom: .5ex;
+}
+
+button {
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: .25em .5em .25em; .5em;
+}
+
+button:hover {
+  background: #ddd;
+  cursor: pointer;
+}
+
+textarea, input {
+  font-size: 1em;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  border: 1px solid #efefef;
+  border-radius: 5px;
+  margin-bottom: .5em;
+  background: #fafafa;
+}
+
+textarea {
+  height: 80px;
+}
+
+a {
+  color: #555;
+}
+
+code {
+  color: #777;
+}
+
+code a {
+  color: #999;
+}
+
+img {
+  border-radius: 5px;
+}
+
 .message {
   padding: .75em;
   background: white;
@@ -15,10 +62,27 @@ body {
   animation: fadein .5s;
 }
 
-#scroller { margin-top: 55px;}
+#navbar {
+  padding-left: 1em;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background: white;
+  border-bottom: 1px solid #efefef;
+}
+
+#scroller { 
+  margin-top: 35px;
+  margin-left: auto;
+  width: 780px;
+  max-width: 100%;
+  margin-right: auto;
+}
 
 @media only screen and (max-width: 680px) {
-  #scroller { margin-top: 0px; }
+  #scroller { margin-top: 35px; }
 }
 
 .indent {
