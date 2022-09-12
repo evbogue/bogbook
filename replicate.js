@@ -169,7 +169,11 @@ function processReq (req, ws) {
           const file = req.substring(49)
           const verify = encode(sha256(new TextEncoder().encode(file)))
           if (hash == verify) {
+            console.log('blob is valid')
+            blastcache.push(hash)
             make(file)
+          } else {
+            console.log('the blob is not valid')
           }
         }
       })
