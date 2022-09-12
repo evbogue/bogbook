@@ -23,8 +23,8 @@ kv.get('log', function (err, file) {
   if (file) {
     log = file
     const newset = new Set(log)
-
-    newset.map(msg => {
+    const newarray = []
+    newset.forEach(msg => {
       open(msg).then(opened => {
         if (opened) {
           newarray.push(opened)
