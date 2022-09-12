@@ -35,8 +35,10 @@ kv.get('log', function (err, file) {
 
     newarray.sort((a,b) => a.timestamp - b.timestamp)
     console.log(arraystore.length)
-    arraystore = newarray
-    console.log(arraystore.length)
+    setTimeout(function () {
+      arraystore = newarray
+      console.log(arraystore.length)
+    }, 5000)
     save()
   }
 })
