@@ -187,8 +187,9 @@ function processReq (req, ws) {
               //if (opened.previous != opened.hash) { 
               //  ws.send(opened.previous)
               //}
+              const src = window.location.hash.substring(1) 
               const getMsg = document.getElementById(opened.hash)
-              if (!getMsg) {
+              if (!getMsg && src == '' || src == opened.hash || src == opened.author) {
                 const scroller = document.getElementById('scroller')
                 render(opened).then(rendered => {
                     if (opened.text) {
