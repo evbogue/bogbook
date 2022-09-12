@@ -83,6 +83,10 @@ img {
 
 @media only screen and (max-width: 680px) {
   #scroller { margin-top: 35px; }
+ 
+  textarea {
+    height: 200px;
+  }
 }
 
 .indent {
