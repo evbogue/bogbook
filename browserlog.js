@@ -28,13 +28,15 @@ kv.get('log', function (err, file) {
       open(msg).then(opened => {
         if (opened) {
           newarray.push(opened)
+          console.log(opened)
         }
       })
     })
 
     newarray.sort((a,b) => a.timestamp - b.timestamp)
-
+    console.log(arraystore.length)
     arraystore = newarray
+    console.log(arraystore.length)
     save()
   }
 })
