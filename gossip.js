@@ -21,7 +21,7 @@ setInterval(function () {
     sockets.forEach(s => s.send(m))
     //console.log(queue.length)
   }
-}, 150)
+}, 25)
 
 setInterval(function () {
   blastcache = []
