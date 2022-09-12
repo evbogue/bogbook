@@ -10,7 +10,7 @@ import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
 
 let notifyqueue = false
 
-const blastcache = []
+let blastcache = []
 
 setInterval(function () {
   if (notifyqueue) {
