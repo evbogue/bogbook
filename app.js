@@ -29,7 +29,7 @@ function start () {
     container.appendChild(navbar())
     route(container)
   } else {
-    setTimeout(function () { start() }, 500)
+    setTimeout(function () { start() }, 5000)
   }
 }
 
