@@ -18,11 +18,12 @@ export async function find (inpns) {
   const file = await kv.get(inpns)
 
   if (file) {
-    const verify = encode(sha256(new TextEncoder().encode(file)))
-      //inpfs checks to make sure the file has not been modified within the database before returning the request
-    if (inpns === verify) {
-      return file
-    }
+    return file
+    //const verify = encode(sha256(new TextEncoder().encode(file)))
+    //  //inpfs checks to make sure the file has not been modified within the database before returning the request
+    //if (inpns === verify) {
+    //  return file
+    //}
   }
   //setTimeout(function () {
   //  if (!file) {
