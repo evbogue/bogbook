@@ -25,13 +25,14 @@ kv.get('log', function (err, file) {
     const newarray = []
     log.map(msg => {
       open(msg).then(opened => {
-        if (opened && !newarray.includes(opened)) {
+        if (opened) {
           newarray.push(opened)
         }
       })
     })
     newarray.sort((a,b) => a.timestamp - b.timestamp)
     arraystore = newarray
+    save()
   }
 })
 
