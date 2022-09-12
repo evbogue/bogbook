@@ -22,15 +22,18 @@ kv.get('arraystore', function (err, file) {
 kv.get('log', function (err, file) {
   if (file) {
     log = file
-    const newarray = []
-    log.map(msg => {
+    const newset = new Set(log)
+
+    newset.map(msg => {
       open(msg).then(opened => {
         if (opened) {
           newarray.push(opened)
         }
       })
     })
+
     newarray.sort((a,b) => a.timestamp - b.timestamp)
+
     arraystore = newarray
     save()
   }
