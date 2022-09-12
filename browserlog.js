@@ -12,24 +12,26 @@ export function save () {
   kv.set('arraystore', arraystore)
 }
 
-kv.get('log', function (err, file) {
-  if (file) {
-    log = file
-    arraystore = []
-    log.map(msg => {
-      open(msg).then(opened => {
-        if (opened) {
-          arraystore.push(opened)
-        }
-      })
-    })
-  }
-})
-
 kv.get('arraystore', function (err, file) {
   if (file) {
     arraystore = file
     arraystore.sort((a,b) => a.timestamp - b.timestamp)
+  }
+})
+
+kv.get('log', function (err, file) {
+  if (file) {
+    log = file
+    const newarray = []
+    log.map(msg => {
+      open(msg).then(opened => {
+        if (opened && !newarray.includes(opened)) {
+          newarray.push(opened)
+        }
+      })
+    })
+    newarray.sort((a,b) => a.timestamp - b.timestamp)
+    arraystore = newarray
   }
 })
 
