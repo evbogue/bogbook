@@ -1,37 +1,20 @@
-import { keys } from './browserkeys.js'
-import { logs } from './browserlog.js'
+import { keys } from './keys.js'
+import { logs } from './log.js'
 import { render } from './render.js'
 import { open } from './sbog.js'
-import { make, find } from './inpfs.js'
+import { make, find } from './blob.js'
 import { encode } from './lib/base64.js'
 import { getBoth } from './avatar.js'
 import { h } from './lib/misc.js'
 import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
 
-let notifyqueue = false
-
 let blastcache = []
-
-setInterval(function () {
-  if (notifyqueue) {
-    if (Notification.permission === "granted") {
-      const notification = new Notification(notifyqueue)
-      notifyqueue = false
-    }
-  }
-  blastcache = []
-}, 10000)
-
-//const peers = new Map()
 
 export function blast (msg) {
   if (!blastcache.includes(msg)) {
     gossipMsg(msg)
     blastcache.push(msg)
   }
-  //for (const peer of peers.values()) {
-  //  peer.send(msg)
-  //}
 }
 
 function replicate (ws) {
@@ -114,11 +97,11 @@ function processReq (req, ws) {
                 //console.log('WE do not have '+ req +', blasting for it ')
                 blast(req)
               }
-            }, 1000)
+            }, 500)
           }
         })
       }
-    }, 1000)
+    }, 500)
   } 
   if (req.length > 44) {
     if (req.startsWith('connect:')) {
@@ -131,11 +114,6 @@ function processReq (req, ws) {
         ' connected.'
       ])
       scroller.insertBefore(connect, scroller.childNodes[1])
-      if (req.substring(8) != keys.pubkey()) {
-        if (Notification.permission === "granted") {
-          const notification = new Notification(req.substring(8, 13) + ' connected.')
-        }
-      }
       logs.getFeeds().then(feedList => {
         feedList.forEach(feed => {
           gossipMsg(feed)
@@ -155,11 +133,6 @@ function processReq (req, ws) {
         ' disconnected.'
       ])
       scroller.insertBefore(disconnect, scroller.childNodes[1])
-      if (req.substring(11) != keys.pubkey()) {
-        if (Notification.permission === "granted") {
-          const notification = new Notification(req.substring(11, 18) + ' disconnected.')
-        }
-      }
     } else if (req.startsWith('blob')) {
       console.log('THIS IS A BLOB')
       const hash = req.substring(5, 49)
@@ -181,32 +154,14 @@ function processReq (req, ws) {
       open(req).then(opened => {
         if (opened) {
           logs.get(opened.hash).then(got => {
-            if (got) {
-              //console.log(opened.hash)
-              //console.log('we already have this message')
-              //console.log(opened)
-            } if (!got) {
-              //console.log('we do not have it, add to db')
+            if (!got) {
               logs.add(req)
-              //if (opened.previous != opened.hash) { 
-              //  ws.send(opened.previous)
-              //}
               const src = window.location.hash.substring(1) 
               const getMsg = document.getElementById(opened.hash)
               if (!getMsg && src == '' || src == opened.hash || src == opened.author) {
                 const scroller = document.getElementById('scroller')
                 render(opened).then(rendered => {
-                    if (opened.text) {
-                      notifyqueue = opened.author.substring(0, 5) + ': ' + opened.text
-                    } else {
-                      setTimeout(function () {
-                        notifyqueue = opened.author.substring(0, 5) + ': ' + opened.text
-                      }, 1000)
-                    }
-
-                  // check if a message already has this as previous, then see if we can find that message on the screen and insert the message underneath it. If we cannot find the message on the screen, then append at the bottom of the scroller. If we do not have a message that contains the previous then we put it at the top because it should be new.
                   logs.getNext(opened.hash).then(next => {
-                    console.log('NEXT: ' + next)
                     if (!next) {
                       scroller.insertBefore(rendered, scroller.childNodes[1])
                     } else {

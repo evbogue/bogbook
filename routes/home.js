@@ -1,8 +1,8 @@
 import { composer } from './../composer.js'
-import { keys } from './../browserkeys.js'
+import { keys } from './../keys.js'
 import { getBoth } from './../avatar.js'
 import { h } from './../lib/misc.js'
-import { logs } from './../browserlog.js'
+import { logs } from './../log.js'
 import { adder } from './../adder.js'
 
 export function home (scroller) {

@@ -17,7 +17,7 @@ export function gossipMsg (m) {
 setInterval(function () {
   if (queue.length) {
     const m = queue.pop()
-    //console.log('SENDING: ' + m)
+    console.log('SENDING: ' + m)
     sockets.forEach(s => s.send(m))
     //console.log(queue.length)
   }

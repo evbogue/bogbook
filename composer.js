@@ -1,13 +1,11 @@
 import { h } from './lib/misc.js'
 import { markdown } from './markdown.js'
 import { publish, open } from './sbog.js'
-import { make, find } from './inpfs.js'
-import { save, logs } from './browserlog.js'
+import { make, find } from './blob.js'
+import { save, logs } from './log.js'
 import { render } from './render.js'
 import { getName, getImage, getBoth } from './avatar.js'
 import { blast } from './replicate.js'
-
-const kv = new IdbKvStore('drafts')
 
 function getContacts (textarea, preview) {
   var span = h('span')
@@ -20,20 +18,20 @@ function getContacts (textarea, preview) {
       logs.getFeeds().then(feeds => {
         feeds.map(feed => {
           addrs.appendChild(h('button', {classList: 'btn', onclick: function () {
-            kv.get('name:' + feed).then(got => {
-              let name = feed.substring(0, 7) + '...'
-              if (got) {
-                name = got
-              }
-              if (textarea.selectionStart || textarea.selectionEnd) {
-                textarea.value = textarea.value.substring(0, textarea.selectionStart)
-                  + ' [' + name + '](' + feed + ') ' +
-                  textarea.value.substring(textarea.selectionEnd, textarea.value.length)
-              } else {
-                textarea.value = textarea.value + ' [' + name + '](' + feed + ')'
-              }
-              preview.innerHTML = marked(textarea.value)
-            })
+            //kv.get('name:' + feed).then(got => {
+            //  let name = feed.substring(0, 7) + '...'
+            //  if (got) {
+            //    name = got
+            //  }
+            //  if (textarea.selectionStart || textarea.selectionEnd) {
+            //    textarea.value = textarea.value.substring(0, textarea.selectionStart)
+            //      + ' [' + name + '](' + feed + ') ' +
+            //      textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+            //  } else {
+            //    textarea.value = textarea.value + ' [' + name + '](' + feed + ')'
+            //  }
+            //  preview.innerHTML = marked(textarea.value)
+            //})
           }}, [getImage(feed), ' ', getName(feed)]))
         })
       })
@@ -93,38 +91,38 @@ export function composer (msg) {
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
   if (msg.hash.length === 44) {
-    kv.get('name:' + msg.author).then(name => {
-      var select = window.getSelection().toString()
-      if (!name) {
-        name = msg.author.substring(0, 10) + '...'
-      }
-      if (msg.author === msg.hash) {
-        textarea.value = '[' + name + '](' + msg.author + ') '
-      } else {
-        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') '
-      }
-    })
+    //kv.get('name:' + msg.author).then(name => {
+    //  var select = window.getSelection().toString()
+    //  if (!name) {
+    //    name = msg.author.substring(0, 10) + '...'
+    //  }
+    //  if (msg.author === msg.hash) {
+    //    textarea.value = '[' + name + '](' + msg.author + ') '
+    //  } else {
+    //    textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') '
+    //  }
+    //})
   }
 
   textarea.addEventListener('input', function (e) {
-    if (textarea.value) {
-      kv.set('draft:' + msg.hash, textarea.value)
-    } else {
-      kv.remove('draft:' + msg.hash)
-    }
+    //if (textarea.value) {
+    //  kv.set('draft:' + msg.hash, textarea.value)
+    //} else {
+    //  kv.remove('draft:' + msg.hash)
+    //}
     preview.innerHTML = markdown(textarea.value)
   })
 
-  kv.get('draft:' + msg.hash).then(got => {
-    if (got) {
-      console.log(got)
-      textarea.value = got
-      preview.innerHTML = markdown(textarea.value)
-      setTimeout(function () {
-        preview.innerHTML = markdown(textarea.value)
-      }, 1000)
-    }
-  })
+  //kv.get('draft:' + msg.hash).then(got => {
+  //  if (got) {
+  //    console.log(got)
+  //    textarea.value = got
+  //    preview.innerHTML = markdown(textarea.value)
+  //    setTimeout(function () {
+  //      preview.innerHTML = markdown(textarea.value)
+  //    }, 1000)
+  //  }
+  //})
 
   const publishButton = h('button', {
     classList: 'btn btn-primary',
@@ -144,7 +142,7 @@ export function composer (msg) {
               }
               preview.innerHTML = '<p></p>'
               textarea.value = ''
-              kv.remove('draft:' + msg.hash)
+              //kv.remove('draft:' + msg.hash)
               save()
             }) 
           })

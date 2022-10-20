@@ -1,11 +1,10 @@
 import nacl from './lib/nacl-fast-es.js'
-import { keys } from './browserkeys.js'
+import { keys } from './keys.js'
 import { decode, encode } from './lib/base64.js'
-import { logs } from './browserlog.js'
-import { make, find } from './inpfs.js'
+import { logs } from './log.js'
+import { make, find } from './blob.js'
 
 export async function publish (data) {
-
   const datahash = await make(data)
 
   const timestamp = Date.now()

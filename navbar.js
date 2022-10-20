@@ -1,5 +1,5 @@
 import { h } from './lib/misc.js'
-import { keys } from './browserkeys.js'
+import { keys } from './keys.js'
 import { getBoth } from './avatar.js'
 
 export function navbar (screen) {

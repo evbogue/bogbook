@@ -2,10 +2,10 @@ import { getBoth, getName } from './avatar.js'
 import { h, human } from './lib/misc.js'
 import { markdown } from './markdown.js'
 import { composer } from './composer.js' 
-import { keys } from './browserkeys.js'
-import { logs } from './browserlog.js'
+import { keys } from './keys.js'
+import { logs } from './log.js'
 import { adder } from './adder.js'
-import { find } from './inpfs.js'
+import { find } from './blob.js'
 import { blast } from './replicate.js'
 
 export async function render (msg) {

@@ -1,4 +1,4 @@
-import { find } from './inpfs.js' 
+import { find } from './blob.js' 
 
 const cached = []
 

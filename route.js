@@ -2,7 +2,7 @@ import { h } from './lib/misc.js'
 import { home } from './routes/home.js'
 import { query } from './routes/query.js'
 import { keyroute } from './routes/key.js'
-import { keys } from './browserkeys.js'
+import { keys } from './keys.js'
 
 export function route (container) {
   const screen = h('div', {id: 'screen', classList: 'row'})

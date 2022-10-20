@@ -1,10 +1,10 @@
 import { h, vb } from './lib/misc.js'
 import { decode } from './lib/base64.js'
-import { keys } from './browserkeys.js'
+import { keys } from './keys.js'
 import { publish, open } from './sbog.js'
 import { render } from './render.js'
-import { logs, save } from './browserlog.js'
-import { make, find } from './inpfs.js'
+import { logs, save } from './log.js'
+import { make, find } from './blob.js'
 
 let imagecache = new Map()
 
