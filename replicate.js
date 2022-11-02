@@ -140,7 +140,13 @@ function processReq (req, ws) {
         if (!found) {
           console.log('WE DO NOT HAVE THE BLOB')
           const file = req.substring(49)
-          const verify = encode(sha256(new TextEncoder().encode(file)))
+          const verify = encode(
+            Array.from(
+              new Uint8Array(
+                await crypto.subtle.digest("SHA-256", new TextEncoder().encode(file))
+              )
+            )
+          )
           if (hash == verify) {
             console.log('blob is valid')
             blastcache.push(hash)

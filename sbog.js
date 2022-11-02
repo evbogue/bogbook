@@ -11,7 +11,14 @@ export async function publish (data) {
 
   const msg = timestamp + keys.pubkey() + datahash
 
-  const hash = encode(sha256(new TextEncoder().encode(msg)))
+  //const hash = encode(sha256(new TextEncoder().encode(msg)))
+  const hash = encode(
+    Array.from(
+      new Uint8Array(
+        await crypto.subtle.digest("SHA-256", new TextEncoder().encode(msg))
+      )
+    )
+  )
 
   let previous = await logs.getLatestHash(keys.pubkey())
 
