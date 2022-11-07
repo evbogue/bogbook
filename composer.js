@@ -143,7 +143,7 @@ export function composer (msg) {
               }
               preview.innerHTML = '<p></p>'
               textarea.value = ''
-              //kv.remove('draft:' + msg.hash)
+              cachekv.rm('draft:' + msg.hash)
               save()
             }) 
           })
