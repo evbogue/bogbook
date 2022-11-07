@@ -5,6 +5,8 @@ import { publish, open } from './sbog.js'
 import { render } from './render.js'
 import { logs, save } from './log.js'
 import { make, find } from './blob.js'
+import { cachekv } from './cachekv.js'
+
 
 let imagecache = new Map()
 
@@ -68,6 +70,7 @@ export function getName (id) {
             if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
               const query = msg.text.substring(5, 49)
               find(query).then(name => {
+                cachekv.put('name:' + msg.author, name)
                 namecache.set(id, name)
                 nameDiv.textContent = name 
               })

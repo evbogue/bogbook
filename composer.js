@@ -19,20 +19,20 @@ function getContacts (textarea, preview) {
       logs.getFeeds().then(feeds => {
         feeds.map(feed => {
           addrs.appendChild(h('button', {classList: 'btn', onclick: function () {
-            //kv.get('name:' + feed).then(got => {
-            //  let name = feed.substring(0, 7) + '...'
-            //  if (got) {
-            //    name = got
-            //  }
-            //  if (textarea.selectionStart || textarea.selectionEnd) {
-            //    textarea.value = textarea.value.substring(0, textarea.selectionStart)
-            //      + ' [' + name + '](' + feed + ') ' +
-            //      textarea.value.substring(textarea.selectionEnd, textarea.value.length)
-            //  } else {
-            //    textarea.value = textarea.value + ' [' + name + '](' + feed + ')'
-            //  }
-            //  preview.innerHTML = marked(textarea.value)
-            //})
+            cachekv.get('name:' + feed).then(got => {
+              let name = feed.substring(0, 7) + '...'
+              if (got) {
+                name = got
+              }
+              if (textarea.selectionStart || textarea.selectionEnd) {
+                textarea.value = textarea.value.substring(0, textarea.selectionStart)
+                  + ' [' + name + '](' + feed + ') ' +
+                  textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+              } else {
+                textarea.value = textarea.value + ' [' + name + '](' + feed + ')'
+              }
+              preview.innerHTML = marked(textarea.value)
+            })
           }}, [getImage(feed), ' ', getName(feed)]))
         })
       })

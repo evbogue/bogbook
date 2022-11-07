@@ -54,7 +54,6 @@ function replicate (ws) {
 //let serverId = 0
 
 function processReq (req, ws) {
-  console.log(req)
   if (req.length === 44) {
     let gotit = false
     if (req === keys.pubkey()) {
