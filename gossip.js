@@ -4,10 +4,9 @@ const outbox = new Map()
 export let queue = []
 let blastcache = []
 
-
-export function gossipMsg (m, sender) {
+export function gossipMsg (m) {
   if (!queue.includes(m) && !blastcache.includes(m)) {
-    queue.unshift(sender + m)
+    queue.unshift(m)
     blastcache.unshift(m)
     //console.log(m)
   } else {
@@ -19,14 +18,7 @@ setInterval(function () {
   if (queue.length) {
     const m = queue.pop()
     sockets.forEach(s => {
-      const sender = m.substring(0, 44)
-      const msg = m.substring(44)
-      if (s.pubkey != sender) { 
-        s.send(msg) 
-        console.log('send: ' + msg)
-      } else {
-        console.log('do not send to sender ' + sender)
-      }
+      s.send(m) 
     })
     //console.log(queue.length)
   }

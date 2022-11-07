@@ -17,4 +17,3 @@ await listenAndServe(":8080", (r) => {
     return serveDir(r, {fsRoot: '', showDirListing: true, quiet: true})
   }
 })
-
