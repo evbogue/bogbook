@@ -1,4 +1,4 @@
-import { listenAndServe } from "https://deno.land/std/http/server.ts"
+import { listenAndServe } from "https://deno.land/std@0.144.0/http/server.ts"
 import { serveDir } from "https://deno.land/std@0.144.0/http/file_server.ts"
 import { addSocket, rmSocket, gossipMsg } from './gossip.js'
 
