@@ -3,21 +3,24 @@ import nacl from './lib/nacl-fast-es.js'
 import { h, human, vb } from './lib/misc.js'
 import { encode, decode } from './lib/base64.js'
 import { make, find } from './blob.js'
-
-const profile = {} 
+import { publish } from './sbog.js'
 
 export const welcome = h('div', {id: 'scroller'})
+
+let keygen = '@/'
+let imagesrc
+let name
+let photoUploaded = false
 
 const keydiv = h('pre', {id: 'keydiv'}, ['/'])
 
 function genkey (brute) {
-  let keygen = '@/'
+  keygen = '@/'
   while (keygen.includes('/') || !keygen.startsWith(brute.substring(0, 1))) {
     const genkey = nacl.sign.keyPair()
     keygen = encode(genkey.publicKey) + encode(genkey.secretKey)
     const keydiv = document.getElementById('keydiv')
     keydiv.textContent = keygen
-    profile.key = keygen
   }
 }
 
@@ -36,11 +39,11 @@ function photoAdder (imgDiv) {
     const reader = new FileReader()
     reader.onloadend = function () {
       img.src = reader.result
-      console.log(img.src)
       make(img.src).then(hash => {
-        profile.image = hash
         const profilePhoto = document.getElementById('profilePhoto')
         profilePhoto.src = reader.result
+        imagesrc = reader.result
+        photoUploaded = true
       })
     }
 
@@ -52,18 +55,18 @@ function photoAdder (imgDiv) {
 
 
 function renderMsg () {
-  const img = vb(decode(profile.key.substring(0, 44)))
+  const img = vb(decode(keygen.substring(0, 44)))
   img.classList = 'avatar'
   img.id = 'profilePhoto'
   const div = h('div', {classList: 'message'}, [
     h('span', {classList: 'right'}, [
-      h('code', [profile.key.substring(0, 7)]),
+      h('code', [keygen.substring(0, 7)]),
       ' ',
       h('a', {href: ''}, [human(new Date(Date.now()))]) 
     ]),
     img,
     ' ',
-    h('a', {href: ''}, [profile.name]),
+    h('a', {href: ''}, [name]),
     h('div', [h('p', ['Hello world!'])])
   ])
   return div
@@ -78,10 +81,17 @@ function photoDiv () {
     photoAdder(),
     h('p', ['Are you ready?']),
     h('button', { onclick: function () {
-      cachekv.put('keypair', profile.key)
-      cachekv.put('profile', JSON.stringify(profile))
-      alert('Don\'t forget to save your keypair somewhere special. It is: ' + profile.key)
-      location.reload()
+      if (photoUploaded) {
+        make(profilePhoto.src).then(hash => {
+          publish('image:' + hash + keygen.substring(0, 44), keygen).then(msg => {
+            alert('Don\'t forget to save your keypair somewhere special. It is: ' + keygen)
+            location.reload()
+          })
+        })
+      } else {
+        alert('Don\'t forget to save your keypair somewhere special. It is: ' + keygen)
+        location.reload()
+      }
     }},['Let\'s go!'])
   ])
   return photo
@@ -96,18 +106,23 @@ const intro = h('div', {classList: 'message'}, [
   nameInput,
   h('button', {onclick: function () {
     if (nameInput.value) {
-      profile.name = nameInput.value
+      name = nameInput.value
       const got = document.getElementById('hello')
       if (got) {
         got.parentNode.removeChild(got)
       }
-      intro.appendChild(h('p', {id: 'hello'} , ['Hi ' + profile.name + '! Here\'s a keypair that starts with the first letter of your name.']))
+      intro.appendChild(h('p', {id: 'hello'} , ['Hi ' + name + '! Here\'s a keypair that starts with the first letter of your name.']))
       hello.appendChild(keydiv)
       this.textContent = 'Try again'
       genkey(nameInput.value)
       hello.appendChild(h('button', { onclick: function () {
-        intro.parentNode.removeChild(intro)
-        welcome.appendChild(photoDiv())
+        make(nameInput.value).then(made => {
+          publish('name:' + made + keygen.substring(0, 44), keygen).then(msg => {
+            cachekv.put('keypair', keydiv.textContent)
+            intro.parentNode.removeChild(intro)
+            welcome.appendChild(photoDiv())
+          })
+        })
       }},['Use this key']))
     } 
   }}, ['Choose']), 
@@ -115,7 +130,7 @@ const intro = h('div', {classList: 'message'}, [
 
 const about = h('div', {classList: 'message'}, [
   h('h1', [window.location.host]),
-  h('img', {style: 'width: 100%', src:'./example.png', classList: 'img-polaroid'}),
+  h('img', {style: 'width: 100%', src:'./example.png'}),
   h('p', {innerHTML:'This is an instance of Bogbook, a distributed social network of secure hashchains. When you publish messages they are signed using ed25519 public key cryptography and relayed via Deno servers.</p><p>This instance is hosted on <a href="https://deno.com/">Deno Deploy</a>.</p></p>Read the code at <a href="https://github.com/evbogue/bogbook/">Github</a> or <a href="https://git.sr.ht/~ev/bogbookv3/">SourceHut</a>.'}),
   h('button', {classList: 'btn btn-large btn-primary', onclick: function () {
     about.parentNode.removeChild(about)

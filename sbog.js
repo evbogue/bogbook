@@ -4,12 +4,25 @@ import { decode, encode } from './lib/base64.js'
 import { logs } from './log.js'
 import { make, find } from './blob.js'
 
-export async function publish (data) {
+export async function publish (data, key) {
+  let pubkey
+  let privkey  
+
+  if (key) {
+    pubkey = key.substring(0, 44)
+    privkey = key.substring(44)
+  }
+  if (!key) {
+    pubkey = keys.pubkey()
+    privkey = keys.privkey()
+  }
+  console.log(pubkey)
+
   const datahash = await make(data)
 
   const timestamp = Date.now()
 
-  const msg = timestamp + keys.pubkey() + datahash
+  const msg = timestamp + pubkey + datahash
 
   //const hash = encode(sha256(new TextEncoder().encode(msg)))
   const hash = encode(
@@ -20,7 +33,7 @@ export async function publish (data) {
     )
   )
 
-  let previous = await logs.getLatestHash(keys.pubkey())
+  let previous = await logs.getLatestHash(pubkey)
 
   if (!previous) {
     previous = hash
@@ -28,9 +41,9 @@ export async function publish (data) {
 
   const next = msg + previous + hash
   
-  const sig = encode(nacl.sign(new TextEncoder().encode(next), decode(keys.privkey())))
+  const sig = encode(nacl.sign(new TextEncoder().encode(next), decode(privkey)))
 
-  const done = keys.pubkey() + sig
+  const done = pubkey + sig
   logs.add(done)
   return done
 }
