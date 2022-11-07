@@ -14,7 +14,7 @@ export function keyroute (scroller) {
     textarea,
     h('button', {classList: 'btn btn-success', onclick: function () {
       if (textarea.value && (textarea.value.length === 132)) {
-        kv.set('keypair', textarea.value).then(function () {
+        cachekv.put('keypair', textarea.value).then(function () {
           location.hash = ''
           location.reload()
         })
@@ -24,17 +24,17 @@ export function keyroute (scroller) {
       }
     }}, ['Import']),
     h('button', {classList: 'btn btn-danger', onclick: function () {
-      kv.remove('keypair').then(function () {
+      cachekv.rm('keypair').then(function () {
         location.hash = ''
         location.reload()
       })
     }}, ['Delete Keypair']),
-    h('button', {classList: 'btn btn-warning', onclick: function () {
-      kv.clear().then(function () {
-        location.hash = ''
-        location.reload()
-      })
-    }}, ['Delete Everything'])
+    //h('button', {classList: 'btn btn-warning', onclick: function () {
+    //  kv.clear().then(function () {
+    //    location.hash = ''
+    //    location.reload()
+    //  })
+    //}}, ['Delete Everything'])
   ])
 
   if (scroller.childNodes[1]) {
