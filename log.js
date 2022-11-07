@@ -125,7 +125,7 @@ export const logs = function logs (query) {
         }
         if (opened && !dupe[0]) {
           //console.log('we do not have ' + opened.hash + ' adding')
-          blast(opened.data)
+          //blast(opened.data)
           log.push(msg)
           arraystore.push(opened)
           newData = true
