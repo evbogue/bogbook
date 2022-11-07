@@ -6,6 +6,7 @@ import { save, logs } from './log.js'
 import { render } from './render.js'
 import { getName, getImage, getBoth } from './avatar.js'
 import { blast } from './replicate.js'
+import { cachekv } from './cachekv.js'
 
 function getContacts (textarea, preview) {
   var span = h('span')
@@ -91,38 +92,38 @@ export function composer (msg) {
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
   if (msg.hash.length === 44) {
-    //kv.get('name:' + msg.author).then(name => {
-    //  var select = window.getSelection().toString()
-    //  if (!name) {
-    //    name = msg.author.substring(0, 10) + '...'
-    //  }
-    //  if (msg.author === msg.hash) {
-    //    textarea.value = '[' + name + '](' + msg.author + ') '
-    //  } else {
-    //    textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') '
-    //  }
-    //})
+    cachekv.get('name:' + msg.author).then(name => {
+      var select = window.getSelection().toString()
+      if (!name) {
+        name = msg.author.substring(0, 10) + '...'
+      }
+      if (msg.author === msg.hash) {
+        textarea.value = '[' + name + '](' + msg.author + ') '
+      } else {
+        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') '
+      }
+    })
   }
 
   textarea.addEventListener('input', function (e) {
-    //if (textarea.value) {
-    //  kv.set('draft:' + msg.hash, textarea.value)
-    //} else {
-    //  kv.remove('draft:' + msg.hash)
-    //}
+    if (textarea.value) {
+      cachekv.put('draft:' + msg.hash, textarea.value)
+    } else {
+      cachekv.rm('draft:' + msg.hash)
+    }
     preview.innerHTML = markdown(textarea.value)
   })
 
-  //kv.get('draft:' + msg.hash).then(got => {
-  //  if (got) {
-  //    console.log(got)
-  //    textarea.value = got
-  //    preview.innerHTML = markdown(textarea.value)
-  //    setTimeout(function () {
-  //      preview.innerHTML = markdown(textarea.value)
-  //    }, 1000)
-  //  }
-  //})
+  cachekv.get('draft:' + msg.hash).then(got => {
+    if (got) {
+      console.log(got)
+      textarea.value = got
+      preview.innerHTML = markdown(textarea.value)
+      setTimeout(function () {
+        preview.innerHTML = markdown(textarea.value)
+      }, 1000)
+    }
+  })
 
   const publishButton = h('button', {
     classList: 'btn btn-primary',
