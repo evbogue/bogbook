@@ -12,21 +12,21 @@ let blastcache = []
 
 export function blast (msg) {
   if (!blastcache.includes(msg)) {
-    gossipMsg(msg)
+    gossipMsg(msg, keys.pubkey())
     blastcache.push(msg)
   }
 }
 
 function replicate (ws) {
   // rec our latest
-  gossipMsg(keys.pubkey())
+  gossipMsg(keys.pubkey(), keys.pubkey())
 
   logs.getFeeds().then(feedList => {
     //console.log(feedList)
     feedList.forEach(feed => {
-      gossipMsg(feed)
+      gossipMsg(feed, keys.pubkey())
       logs.getLatest(feed).then(latest => {
-        gossipMsg(latest.raw)
+        gossipMsg(latest.raw, keys.pubkey())
       })
     })
   })
@@ -38,7 +38,7 @@ function replicate (ws) {
     //console.log('checking for route feed' + src)
     logs.query(src).then(query => {
       if (!query[0]) {
-        gossipMsg(src)
+        gossipMsg(src, keys.pubkey())
       }
     })
   }
@@ -71,7 +71,7 @@ function processReq (req, ws) {
         logs.get(latest.hash).then(got => {
           if (got) {
             gotit = true
-            gossipMsg(got.hash)
+            gossipMsg(got.hash, keys.pubkey())
           }
         })
       } else {
@@ -79,7 +79,7 @@ function processReq (req, ws) {
           if (post) {
             gotit = true
             //console.log(req + ' is a post, sending')
-            gossipMsg(post.raw)
+            gossipMsg(post.raw, keys.pubkey())
           } 
         })
       }
@@ -91,7 +91,7 @@ function processReq (req, ws) {
             gotit = true
             //console.log(req + ' is a blob, sending')
             //console.log(file)
-            gossipMsg('blob:' + req + file)
+            gossipMsg('blob:' + req + file, keys.pubkey())
             setTimeout(function () {
               if (!gotit) {
                 //console.log('WE do not have '+ req +', blasting for it ')
@@ -116,9 +116,9 @@ function processReq (req, ws) {
       scroller.insertBefore(connect, scroller.childNodes[1])
       logs.getFeeds().then(feedList => {
         feedList.forEach(feed => {
-          gossipMsg(feed)
+          gossipMsg(feed, keys.pubkey())
           logs.getLatest(feed).then(latest => {
-            gossipMsg(latest.raw)
+            gossipMsg(latest.raw, keys.pubkey())
           })
         })
       })
@@ -138,22 +138,9 @@ function processReq (req, ws) {
       const hash = req.substring(5, 49)
       find(hash).then(found => {
         if (!found) {
-          console.log('WE DO NOT HAVE THE BLOB')
           const file = req.substring(49)
-          const verify = encode(
-            Array.from(
-              new Uint8Array(
-                await crypto.subtle.digest("SHA-256", new TextEncoder().encode(file))
-              )
-            )
-          )
-          if (hash == verify) {
-            console.log('blob is valid')
-            blastcache.push(hash)
-            make(file)
-          } else {
-            console.log('the blob is not valid')
-          }
+          blastcache.push(hash)
+          make(file)
         }
       })
     } else {
@@ -190,6 +177,30 @@ function processReq (req, ws) {
   }
 }
 
+function sendAvatar (ws) {
+  const id = keys.pubkey()
+  logs.query(id).then(querylog => {
+    if (querylog && querylog[0]) {
+      querylog.forEach(msg => {
+        if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
+          ws.send(msg)
+          const query = msg.text.substring(5, 49)
+          find(query).then(name => {
+            ws.send('blob:' + query + name)
+          })
+        }
+        if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
+          ws.send(msg)
+          const query = msg.text.substring(6, 50)
+          find(query).then(image => {
+            ws.send('blob:' + query + image)
+          })
+        } 
+      })
+    }
+  })
+}
+
 export function connect (server) {
   console.log('Connecting to ' + server)
   const ws = new WebSocket(server)
@@ -197,6 +208,7 @@ export function connect (server) {
 
   ws.onopen = () => {
     ws.send('connect:' + keys.pubkey())
+    sendAvatar(ws)    
     addSocket(ws)
     replicate(ws)
   }
