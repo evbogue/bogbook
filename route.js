@@ -11,7 +11,12 @@ export function route (container) {
   const scroller = h('div', {id: 'scroller', classList: 'span8 offset2'})
   screen.appendChild(scroller)
   
-  const src = window.location.hash.substring(1)
+  let src = window.location.hash.substring(1)
+
+  if (src.length == 43) {
+    window.location.hash = src + '='
+  }
+
   document.title = location.host + ' | ' + location.hash.substring(1)
 
   if (location.hash.substring(1) === '') {
