@@ -72,6 +72,7 @@ function processReq (req, ws) {
           if (got) {
             gotit = true
             gossipMsg(got.hash, keys.pubkey())
+            //gossipMsg(got.data, keys.pubkey())
           }
         })
       } else {
@@ -80,7 +81,7 @@ function processReq (req, ws) {
             gotit = true
             //console.log(req + ' is a post, sending')
             gossipMsg(post.raw, keys.pubkey())
-            gossipMsg(post.data, keys.pubkey())
+            //gossipMsg(post.data, keys.pubkey())
           } 
         })
       }

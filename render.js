@@ -75,7 +75,7 @@ export async function render (msg) {
             h('a', {href: '#' + named}, [file])
           ])
           content.appendChild(span)
-        } 
+        }
       }) 
     } else {
       content.innerHTML = markdown(data)
@@ -91,7 +91,9 @@ export async function render (msg) {
       if (data) {
         contentRender(data, content)
       } else if (retries < 5) {
+        console.log('WE DO NOT HAVE ' + hash)
         blast(hash)
+        retries ++
         setTimeout(function () {
           getData(hash, content)
         }, 5000 * retries)
