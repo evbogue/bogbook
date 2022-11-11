@@ -31,6 +31,11 @@ export async function render (msg) {
     ' ',
     merklenav,
     ' ',
+    h('code', [h('a', {href: '#', onclick: function (e) {
+      e.preventDefault()
+      message.appendChild(h('pre', [JSON.stringify(msg)]))
+    }}, ['raw'])]),
+    ' ',
     timestamp
   ]))
 
@@ -89,6 +94,7 @@ export async function render (msg) {
   function getData (hash, content) {
     find(hash).then(data => {
       if (data) {
+        console.log(data)
         contentRender(data, content)
       } else if (retries < 5) {
         console.log('WE DO NOT HAVE ' + hash)
