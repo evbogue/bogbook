@@ -80,6 +80,7 @@ function processReq (req, ws) {
             gotit = true
             //console.log(req + ' is a post, sending')
             gossipMsg(post.raw, keys.pubkey())
+            gossipMsg(post.data, keys.pubkey())
           } 
         })
       }
@@ -133,8 +134,8 @@ function processReq (req, ws) {
         ' disconnected.'
       ])
       scroller.insertBefore(disconnect, scroller.childNodes[1])
-    } else if (req.startsWith('blob')) {
-      console.log('THIS IS A BLOB')
+    } else if (req.startsWith('blob:')) {
+      //console.log('THIS IS A BLOB')
       const hash = req.substring(5, 49)
       find(hash).then(found => {
         if (!found) {
@@ -177,29 +178,29 @@ function processReq (req, ws) {
   }
 }
 
-function sendAvatar (ws) {
-  const id = keys.pubkey()
-  logs.query(id).then(querylog => {
-    if (querylog && querylog[0]) {
-      querylog.forEach(msg => {
-        if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
-          ws.send(msg.raw)
-          const query = msg.text.substring(5, 49)
-          find(query).then(name => {
-            ws.send('blob:' + query + name)
-          })
-        }
-        if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
-          ws.send(msg.raw)
-          const query = msg.text.substring(6, 50)
-          find(query).then(image => {
-            ws.send('blob:' + query + image)
-          })
-        } 
-      })
-    }
-  })
-}
+//function sendAvatar (ws) {
+//  const id = keys.pubkey()
+//  logs.query(id).then(querylog => {
+//    if (querylog && querylog[0]) {
+//      querylog.forEach(msg => {
+//        if (msg.text && msg.text.startsWith('name:') && msg.text.substring(49) === id) {
+//          ws.send(msg.hash)
+//          const query = msg.text.substring(5, 49)
+//          find(query).then(name => {
+//            ws.send('blob:' + query + name)
+//          })
+//        }
+//        if (msg.text && msg.text.startsWith('image:') && msg.text.substring(50) === id) {
+//          ws.send(msg.raw)
+//          const query = msg.text.substring(6, 50)
+//          find(query).then(image => {
+//            ws.send('blob:' + query + image)
+//          })
+//        } 
+//      })
+//    }
+//  })
+//}
 
 export function connect (server) {
   console.log('Connecting to ' + server)
@@ -208,7 +209,7 @@ export function connect (server) {
 
   ws.onopen = () => {
     ws.send('connect:' + keys.pubkey())
-    sendAvatar(ws)    
+    //sendAvatar(ws)    
     addSocket(ws)
     replicate(ws)
   }

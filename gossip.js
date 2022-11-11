@@ -4,7 +4,8 @@ const outbox = new Map()
 export let queue = []
 let blastcache = []
 
-export function gossipMsg (m) {
+export function gossipMsg (m, pubkey) {
+  // we do not use the pubkey yet, but we want to send it to the relay so the relay can have a better idea of who wants what messages
   if (!queue.includes(m) && !blastcache.includes(m)) {
     queue.unshift(m)
     blastcache.unshift(m)
