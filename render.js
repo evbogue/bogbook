@@ -57,57 +57,63 @@ export async function render (msg) {
     }
   }}, ['Reply'])
 
-  //function contentRender(data, content) {
-  //  if (data.startsWith('image:')) {
-  //    content.innerHTML = ''
-  //    const named = data.substring(50)
-  //    find(data.substring(6, 50)).then(file => {
-  //      if (file) {
-  //        const span = h('span', [
-  //          ' imaged ',
-  //          h('a', {href: '#' + named}, [h('img', {classList: 'avatar', src: file})])
-  //        ])
-  //        content.appendChild(span)
-  //      }
-  //    })
-  //  } else if (data.startsWith('name:')) {
-  //    content.innerHTML = ''
-  //    const named = data.substring(49)
-  //    find(data.substring(5, 49)).then(file => {
-  //      if (file) {
-  //        const span = h('span', [
-  //          ' named ',
-  //          h('a', {href: '#' + named}, [file])
-  //        ])
-  //        content.appendChild(span)
-  //      }
-  //    }) 
-  //  } else {
-  //    content.innerHTML = markdown(data)
-  //  }
-  //}
+  function contentRender(data, content) {
+    if (data.startsWith('image:')) {
+      content.innerHTML = ''
+      const named = data.substring(50)
+      const hash = data.substring(6,50)
+      find(hash).then(file => {
+        if (file) {
+          const span = h('span', [
+            ' imaged ',
+            h('a', {href: '#' + named}, [h('img', {classList: 'avatar', src: file})])
+          ])
+          content.appendChild(span)
+        } else {
+          blast(hash)
+        }
+      })  
+    } else if (data.startsWith('name:')) {
+      content.innerHTML = ''
+      const named = data.substring(49)
+      const hash = data.substring(5, 49)
+      find(hash).then(file => {
+        if (file) {
+          const span = h('span', [
+            ' named ',
+            h('a', {href: '#' + named}, [file])
+          ])
+          content.appendChild(span)
+        } else {
+          blast(hash)
+        }
+      }) 
+    } else {
+      content.innerHTML = markdown(data)
+    }
+  }
 
   const content = h('div')
 
-  //let retries = 0
-  //
-  //function getData (hash, content) {
-  //  find(hash).then(data => {
-  //    if (data) {
-  //      console.log(data)
-  //      contentRender(data, content)
-  //    } else if (retries < 5) {
-  //      console.log('WE DO NOT HAVE ' + hash)
-  //      blast(hash)
-  //      retries ++
-  //      setTimeout(function () {
-  //        getData(hash, content)
-  //      }, 5000 * retries)
-  //    }
-  //  })
-  //}
-  content.innerHTML = markdown(msg.text)
-  //getData(msg.data, content)
+  let retries = 0
+  
+  function getData (hash, content) {
+    find(hash).then(data => {
+      if (data) {
+        console.log(data)
+        contentRender(data, content)
+      } else if (retries < 5) {
+        console.log('WE DO NOT HAVE ' + hash)
+        blast(hash)
+        retries ++
+        setTimeout(function () {
+          getData(hash, content)
+        }, 5000 * retries)
+      }
+    })
+  }
+  //content.innerHTML = markdown(msg.text)
+  getData(msg.data, content)
   message.appendChild(content)
   message.appendChild(reply)
 
