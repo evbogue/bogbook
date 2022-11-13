@@ -16,12 +16,11 @@ export function gossipMsg (m, pubkey) {
 }
 
 setInterval(function () {
-  if (queue.length) {
+  if (queue.length && sockets.size) {
     const m = queue.pop()
     sockets.forEach(s => {
       s.send(m) 
     })
-    //console.log(queue.length)
   }
 }, 25)
 

@@ -113,7 +113,7 @@ export const logs = function logs (query) {
       if (msgarray[0]) {
         //console.log('we have ' + hash)
         return msgarray[0]
-      } else {
+      } else { 
         //console.log('we do not have ' + hash)
       }
     }, 
