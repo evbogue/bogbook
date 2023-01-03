@@ -16,7 +16,6 @@ export async function publish (data, key) {
     pubkey = keys.pubkey()
     privkey = keys.privkey()
   }
-  console.log(pubkey)
 
   const datahash = await make(data)
 
