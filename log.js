@@ -1,5 +1,4 @@
 import { open } from './sbog.js'
-import { blast } from './replicate.js'
 import { cachekv } from './cachekv.js'
 
 let arraystore = []
@@ -125,13 +124,10 @@ export const logs = function logs (query) {
         }
         if (opened && !dupe[0]) {
           //console.log('we do not have ' + opened.hash + ' adding')
-          //blast(opened.data)
           log.push(msg)
           arraystore.push(opened)
           newData = true
           save()
-          //blast(opened.hash)
-          //blast(opened.data)
         }
       })
     }
