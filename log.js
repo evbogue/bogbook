@@ -35,8 +35,8 @@ cachekv.get('log').then(file => {
     setTimeout(function () {
       newarray.sort((a,b) => a.timestamp - b.timestamp)
       arraystore = newarray
+      save()
     }, 5000)
-    save()
   }
 })
 
