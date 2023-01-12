@@ -20,7 +20,11 @@ if ('caches' in window) {
   }
   
   cachekv.put = async function (key, string) {
-    cache.put(url + key, new Response(string))
+    await cache.delete(url + key)
+    await cache.put(url + key, new Response(string))
+    //cachekv.get(key).then(got => {
+    //  console.log(got)
+    //})
   }
   
   cachekv.rm = async function (key) {
