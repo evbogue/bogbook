@@ -1,19 +1,28 @@
-// has broadcastChannel API disabled so that we do not _have_ to depend on Deno Deploy to test things
-
-import { listenAndServe } from "https://deno.land/std/http/server.ts"
-import { serveDir } from "https://deno.land/std@0.144.0/http/file_server.ts"
+import { serveDir } from "https://deno.land/std@0.170.0/http/file_server.ts"
 import { addSocket, rmSocket, gossipMsg } from './gossip.js'
 
-await listenAndServe(":8080", (r) => {
-  try {
-    const { socket, response } = Deno.upgradeWebSocket(r)
-    addSocket(socket)
-    socket.onmessage = e => {
-      gossipMsg(e.data)
+const port = 8080
+
+const server = Deno.listen({ port })
+
+console.log('Listening at http://localhost:' + port + '/')
+
+for await (const conn of server) {
+  handleHttp(conn).catch(console.error)
+}
+
+async function handleHttp(conn) {
+  const httpConn = Deno.serveHttp(conn)
+  for await (const e of httpConn) {
+    try {
+      const { socket, response } = Deno.upgradeWebSocket(e.request)
+      addSocket(socket)
+      socket.onmessage = ev => { gossipMsg(ev.data) }
+      socket.onclose = _ => rmSocket(socket)
+      e.respondWith(response)
+    } catch {
+      e.respondWith(serveDir(e.request, {fsRoot: '', showDirListing: true, quiet: true}))
     }
-    socket.onclose = _ => rmSocket(socket)
-    return response
-  } catch {
-    return serveDir(r, {fsRoot: '', showDirListing: true, quiet: true})
   }
-})
+}
+
