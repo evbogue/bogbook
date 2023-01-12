@@ -3,7 +3,7 @@ import { encode, decode } from './lib/base64.js'
 import { open } from './sbog.js'
 import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
 import { logs } from './log.js'
-import { find } from './blob.js' 
+import { find, make } from './blob.js' 
 
 const server = 'ws://localhost:8080/ws' 
 
@@ -53,7 +53,7 @@ function processReq (req, ws) {
             setTimeout(function () {
               if (!gotit) {
                 //console.log('WE do not have '+ req +', blasting for it ')
-                blast(req)
+                gossipMsg(req, keys.pubkey())
               }
             }, 500)
           }
@@ -82,6 +82,11 @@ function processReq (req, ws) {
           logs.get(opened.hash).then(got => {
             if (!got) {
               logs.add(req)
+              logs.get(req.previous).then(gotit => {
+                if (!gotit) {
+                  gossipMsg(opened.previous, keys.pubkey())
+                }
+              })
               console.log('New post from ' + opened.author + ' ' + opened.hash)
             }
           })
@@ -90,73 +95,6 @@ function processReq (req, ws) {
     }
   }
 }
-
-//function processReq (req, ws) {
-//  if (req.length === 44) {
-//    let got = false
-//    if (msgstore.has(req)) {
-//      const msg = msgstore.get(req)
-//      gossipMsg(msg.raw)
-//      if (blobstore.has(msg.data)) {
-//        const data = blobstore.get(msg.data)
-//        gossipMsg('blob:' + req + data)
-//      } else {
-//        gossipMsg(msg.data)
-//      }
-//      got = true
-//    }
-//    if (blobstore.has(req)) {
-//      const data = blobstore.get(req)
-//      gossipMsg('blob:' + req + data)
-//      got = true
-//    } 
-//    if (!got) {
-//      getLatest(req).then(msg => {
-//        if (msg) {
-//          gossipMsg(msg.raw)
-//          if (blobstore.has(msg.data)) {
-//            const data = blobstore.get(msg.data)
-//            gossipMsg('blob:' + req + data)
-//          } else {
-//            gossipMsg(msg.data)
-//          }
-//        }
-//      })
-//    }
-//  } 
-//  if (req.length > 44) {
-//    if (req.startsWith('connect:') || req.startsWith('disconnect:')) {
-//      console.log(req)
-//    } else if (req.startsWith('blob')) {
-//      const hash = req.substring(5, 49)
-//      if (!blobstore.has(hash)) {
-//        const file = req.substring(49)
-//        crypto.subtle.digest("SHA-256", new TextEncoder().encode(file)).then(digest => {
-//          const verify = encode(digest)
-//          if (hash === verify) {
-//            //console.log('Added blob: ' + hash)
-//            blobstore.set(hash, file)
-//          }
-//        })
-//      }
-//    } else {
-//      open(req).then(opened => {
-//        if (!blobstore.has(opened.data)) {
-//          gossipMsg(opened.data)
-//        }
-//        //console.log(opened)
-//        if (!msgstore.has(opened.hash)) {
-//          console.log('Added post: ' + opened.hash)
-//          msgstore.set(opened.hash, opened)
-//          log.push(opened)
-//        }
-//        if (!msgstore.has(opened.previous)) {
-//          gossipMsg(opened.previous)
-//        }
-//      })
-//    }
-//  }
-//}
 
 const sockets = new Set()
 
@@ -177,6 +115,10 @@ export function connect (server) {
       processReq(msg.data, ws)
     }
   }
+
+  setInterval(function () {
+    ws.send(keys.pubkey())
+  }, 100000)
 
   Deno.addSignalListener("SIGINT", () => {
     ws.send('disconnect:' + keys.pubkey())
@@ -201,4 +143,15 @@ export function connect (server) {
   }
 }
 
-connect(server)
+function start () {
+  if (keys) {
+    console.log(keys.pubkey())
+    connect(server)
+  } else {
+    setTimeout(function () {
+      start()
+    }, 5000)
+  }
+}
+
+start()

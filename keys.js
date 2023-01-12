@@ -6,13 +6,16 @@ export let keys
 
 cachekv.get('keypair').then(keypair => {
   if (!keypair) {
-    keys = 'welcome'
-    //let keygen = '@/'
-    //while (keygen.includes('/')) {
-    //  const genkey = nacl.sign.keyPair()
-    //  keygen = encode(genkey.publicKey) + encode(genkey.secretKey)
-    //  cachekv.put('keypair', keygen)
-    //}
+    if (window.Deno) {
+      let keygen = '@/'
+      while (keygen.includes('/')) {
+        const genkey = nacl.sign.keyPair()
+        keygen = encode(genkey.publicKey) + encode(genkey.secretKey)
+        cachekv.put('keypair', keygen)
+      }
+    } else {
+      keys = 'welcome'
+    }
   } 
   if (keypair) {
     keys = {
