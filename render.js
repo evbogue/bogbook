@@ -33,7 +33,13 @@ export async function render (msg) {
     ' ',
     h('code', [h('a', {href: '#', onclick: function (e) {
       e.preventDefault()
-      message.appendChild(h('pre', [JSON.stringify(msg)]))
+      const raw = h('pre', {id: 'raw:' + msg.id},[JSON.stringify(msg)])
+      const getRaw = document.getElementById('raw:' + msg.id)
+      if (getRaw) {
+        getRaw.parentNode.removeChild(getRaw)
+      } else {
+        message.appendChild(raw)
+      }
     }}, ['raw'])]),
     ' ',
     timestamp
