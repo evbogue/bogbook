@@ -107,8 +107,8 @@ export function newName (id, div) {
       }
       if (input.value) {
         make(input.value).then(made => {
-          blast(made)
           publish('name:' + made + id).then(msg => {
+            blast(made)
             open(msg).then(opened => {
               blast(opened.raw)
               blast(opened.data)
