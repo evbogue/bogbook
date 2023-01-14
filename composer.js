@@ -132,6 +132,7 @@ export function composer (msg) {
         publish(textarea.value).then(published => {
           open(published).then(opened => {
             blast(opened.raw)
+            blast(opened.data)
             //blast(opened.data)
             render(opened).then(rendered => {
               const getMsg = document.getElementById(msg.hash)
