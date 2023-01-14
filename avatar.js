@@ -5,8 +5,8 @@ import { publish, open } from './sbog.js'
 import { render } from './render.js'
 import { logs, save } from './log.js'
 import { make, find } from './blob.js'
+import { blast } from './replicate.js'
 import { cachekv } from './cachekv.js'
-
 
 let imagecache = new Map()
 
@@ -107,8 +107,11 @@ export function newName (id, div) {
       }
       if (input.value) {
         make(input.value).then(made => {
+          blast(made)
           publish('name:' + made + id).then(msg => {
             open(msg).then(opened => {
+              blast(opened.raw)
+              blast(opened.data)
               render(opened).then(rendered => {
                 div.appendChild(rendered)
               })
