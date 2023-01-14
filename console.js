@@ -84,6 +84,7 @@ function processReq (req, ws) {
               logs.add(req)
               logs.get(req.previous).then(gotit => {
                 if (!gotit) {
+                  gossipMsg(opened.data, keys.pubkey())
                   gossipMsg(opened.previous, keys.pubkey())
                 }
               })
