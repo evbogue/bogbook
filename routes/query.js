@@ -25,11 +25,11 @@ function photoAdder (src, div) {
     reader.onloadend = function () {
       img.src = reader.result
       make(img.src).then(hash => {
-        blast(hash)
         const imgDiv = h('div', [
           img,
           h('button', {classList: 'btn', onclick: function () {
             publish('image:' + hash + src).then(msg => {
+              blast(hash)
               open(msg).then(opened => {
                 blast(msg.raw)
                 blast(msg.data)
