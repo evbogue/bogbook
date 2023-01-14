@@ -29,12 +29,12 @@ export function keyroute (scroller) {
         location.reload()
       })
     }}, ['Delete Keypair']),
-    //h('button', {classList: 'btn btn-warning', onclick: function () {
-    //  kv.clear().then(function () {
-    //    location.hash = ''
-    //    location.reload()
-    //  })
-    //}}, ['Delete Everything'])
+    h('button', {classList: 'btn btn-warning', onclick: function () {
+      cachekv.clear().then(function () {
+        location.hash = ''
+        location.reload()
+      })
+    }}, ['Delete Everything'])
   ])
 
   if (scroller.childNodes[1]) {

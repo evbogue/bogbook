@@ -22,13 +22,14 @@ if ('caches' in window) {
   cachekv.put = async function (key, string) {
     await cache.delete(url + key)
     await cache.put(url + key, new Response(string))
-    //cachekv.get(key).then(got => {
-    //  console.log(got)
-    //})
   }
   
   cachekv.rm = async function (key) {
     cache.delete(url + key)
+  }
+
+  cachekv.clear = async function () {
+    caches.delete(db)
   }
 } else {
   console.log('No Cache API available')
