@@ -106,10 +106,8 @@ export async function render (msg) {
   function getData (hash, content) {
     find(hash).then(data => {
       if (data) {
-        console.log(data)
         contentRender(data, content)
       } else if (retries < 5) {
-        console.log('WE DO NOT HAVE ' + hash)
         blast(hash)
         retries ++
         setTimeout(function () {

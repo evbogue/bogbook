@@ -1,6 +1,6 @@
 body {
   background: #fafafa;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: sans-serif;
 }
 
 p {
@@ -35,7 +35,12 @@ textarea {
 }
 
 a {
-  color: #555;
+  color: #007aa5;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 code {
@@ -103,6 +108,9 @@ pre, code {
   white-space: pre\9;
 }
 
+hr { display: block; height: 1px;
+    border: 0; border-top: 1px solid #efefef;
+    margin: 1em 0; padding: 0; }
 
 @keyframes fadein {
     from { opacity: 0; }
