@@ -126,10 +126,10 @@ export async function render (msg) {
   messageDiv.appendChild(replyDiv)
 
   logs.query('?' + src).then(log => {
-    log.forEach(msg => {
-      const getMsg = document.getElementById(msg.hash)
+    log.forEach(item => {
+      const getMsg = document.getElementById(item.hash)
       if (!getMsg) {
-        render(msg).then(rendered => {
+        render(item).then(rendered => {
           replyDiv.appendChild(rendered)
         })
       }
