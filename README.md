@@ -6,17 +6,17 @@
 
 There have been a handful of attempts at creating distributed social networks of signed messages. Many people have tried [Secure Scuttlebutt](https://scuttlebot.io), and now [Nostr](https://github.com/nostr-protocol/), and felt somewhat frustrated with the experience. 
 
-I've been working on Bogbook since 2020, ever since walking away from creating Scuttlebutt clients. In the first version of Bogbook I tried no having any replication strategy at all, similar to how Nostr now works, and I discovered that there was no way to communicate to peers which posts I wanted to replicate into my client, which lead many unnecessary network calls. Next, I implemented an append-only log similar to SSB, but I found the initial sync experience took too long as you had to wait for every message from your peers to sync before seeing the latest messages. 
+I've been working on Bogbook since 2020, ever since walking away from creating Scuttlebutt clients. In the first version of Bogbook I tried not having any replication strategy at all, similar to how Nostr now works, and I discovered that there was no way to communicate to peers which posts I wanted to replicate into my client, which lead many unnecessary network calls. Next, I implemented an append-only log similar to SSB, but I found the initial sync experience took too long as you had to wait for every message from your peers to sync before seeing the latest messages. 
 
 In this latest version of Bogbook (v3) I'm attaching the hash of the previous post to every message, so you can sync backwards from the latest message until you reach the first message. This means you can begin interacting immediately, and there is no need for peers to send requests for data that you already have in the client.
 
 Bogbook always creates data first in the web browser, saving it in a local cache. Next it reaches out to a relay hosted at [Deno Deploy](https://deno.com/deploy) and that relay sends your posts to peers. Periodically your client will reach out for new posts from the pubkeys you are following. 
 
-In Bogbook your posts are self-authenticating using a ed25519 signing key, which means that they can exist on all of the peers without any centralized or federated point of failure. To authenticate a post you open a signed message and then request the hash of the blob associated with the post.
+In Bogbook your posts are self-authenticating using an ed25519 signing key, which means that they can exist on all of the peers without any centralized or federated point of failure. To authenticate a post you open a signed message and then request the hash of the blob associated with the post.
 
-If you are replying to someone or referencing a post all of that is included within text of the post, so your client can look those items up simply by reading the post and looking for any links that are 44 characters long, so there are no weird JSON schemas to remember when you are implementing a client.
+If you are replying to someone or referencing a post all of the necessary references are included within text of the post, so your client can look those items up simply by reading the post and looking for any links that are 44 characters long, so there are no weird JSON schemas to remember when you are implementing a client. If you want to mention someone, you just create a markdown link with their name and their pubkey as the link. If you want to reference a post, you create markdown link with some text and the link is the hash of the post. Bogbook's client composer does all of this for you when you hit the reply button.
 
-This is not just theoretical, you can try it right now at https://bogbook.com/ just choose a key, give yourself a name, and you are an active participant on the network.
+Bogbook is not just theoretical! You can try it right now at https://bogbook.com/ just choose a key, give yourself a name, and you are an active participant on the network.
 
 ### Get started
 
