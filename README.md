@@ -6,7 +6,7 @@
 
 There have been a handful of attempts at creating distributed social networks of signed messages. Many people have tried [Secure Scuttlebutt](https://scuttlebot.io), and now [Nostr](https://github.com/nostr-protocol/), and felt somewhat frustrated with the experience. 
 
-I've been working on Bogbook since 2020, ever since walking away from creating Scuttlebutt clients. In the first version of Bogbook I tried not having any replication strategy at all, similar to how Nostr now works, and I discovered that there was no way to communicate to peers which posts I wanted to replicate into my client, which lead many unnecessary network calls. Next, I implemented an append-only log similar to SSB, but I found the initial sync experience took too long as you had to wait for every message from your peers to sync before seeing the latest messages. 
+I've been working on Bogbook since 2020, ever since walking away from creating Scuttlebutt clients. In the first version of Bogbook I tried not having any replication strategy at all, similar to how Nostr now works, and I discovered that there was no way to communicate to peers which posts I wanted to replicate into my client, which lead to many unnecessary network calls. Next, I implemented an append-only log similar to SSB, but I found the initial sync experience took too long as you had to wait for every message from your peers to sync before seeing the latest messages. 
 
 In this latest version of Bogbook (v3) I'm attaching the hash of the previous post to every message, so you can sync backwards from the latest message until you reach the first message. This means you can begin interacting immediately, and there is no need for peers to send requests for data that you already have in the client.
 
