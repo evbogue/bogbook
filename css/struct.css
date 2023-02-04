@@ -13,7 +13,7 @@ button {
   font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: .25em .5em .25em; .5em;
+  padding: .25em .5em .25em .5em;
 }
 
 button:hover {
