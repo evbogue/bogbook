@@ -52,31 +52,68 @@ function photoAdder (textarea, preview) {
     input.click()
   }}, ['📸 '])
 
+  const input = h('input', { type: 'file', style: 'display: none;'})
+  const outputImage = h('img')
 
-  const input = h('input', { type: 'file', style: 'display: none;', onchange: function (e) {
-    for (let i = 0; i < e.srcElement.files.length; i++) {
-      const file = e.srcElement.files[i]
-      const img = h('img', {classList: 'thumb'})
-      const reader = new FileReader()
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
 
-      reader.onloadend = function () {
-        img.src = reader.result
-        make(img.src).then(hash => {
-          if (textarea.selectionStart || textarea.selectionEnd) {
-            textarea.value = textarea.value.substring(0, textarea.selectionStart)
-              + ' ![](' + hash + ') ' +
-              textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+    reader.onload = (e) => {
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")
+      const img = new Image()
+
+      img.onload = () => {
+        const size = 1024
+        if (img.width > size || img.height > size) {
+          const width = img.width
+          const height = img.height
+          let cropWidth
+          let cropHeight
+
+          if (width > height) {
+            cropWidth = size
+            cropHeight = cropWidth * (height / width)
           } else {
-            textarea.value = textarea.value + ' ![](' + hash + ')'
+            cropHeight = size
+            cropWidth = cropHeight * (width / height)
           }
-          setTimeout(function () {
+
+          canvas.width = cropWidth
+          canvas.height = cropHeight
+          ctx.drawImage(img, 0, 0, width, height, 0, 0, cropWidth, cropHeight)
+          const croppedImage = canvas.toDataURL()
+          outputImage.src = croppedImage
+
+          make(outputImage.src).then(hash => {
+            if (textarea.selectionStart || textarea.selectionEnd) {
+              textarea.value = textarea.value.substring(0, textarea.selectionStart)
+                + ' ![](' + hash + ') ' +
+                textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+            } else {
+              textarea.value = textarea.value + ' ![](' + hash + ')'
+            }
             preview.innerHTML = markdown(textarea.value)
-          }, 1000)
-        })   
+          })
+        } else {
+          make(img.src).then(hash => {
+            if (textarea.selectionStart || textarea.selectionEnd) {
+              textarea.value = textarea.value.substring(0, textarea.selectionStart)
+                + ' ![](' + hash + ') ' +
+                textarea.value.substring(textarea.selectionEnd, textarea.value.length)
+            } else {
+              textarea.value = textarea.value + ' ![](' + hash + ')'
+            }
+            preview.innerHTML = markdown(textarea.value)
+          })
+        }
       }
-      reader.readAsDataURL(file)
+      img.src = e.target.result
     }
-  }})
+
+    reader.readAsDataURL(file)
+  })
 
   const buttonsDiv = h('span', [
     uploadButton,
