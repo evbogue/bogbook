@@ -1,5 +1,7 @@
 import { h } from './lib/misc.js'
 import { cache } from './cache.js'
+import { find } from './blob.js'
+import { blast } from './replicate.js'
 
 const renderer = new marked.Renderer()
 
@@ -58,10 +60,22 @@ renderer.link = function (href, title, text) {
 
 renderer.image = function (src, unknown, title) {
   if (src.length === 44) {
-    const image = cache.get(src)
-    if (image) {
-      return '<div><img src="' + image + '" title="' + title + '" class="img-polaroid thumb" /></div>'
-    } else { return ''}
+    find(src).then(file => {
+      if (file) {
+        const div = document.getElementById(src)
+        div.src = file
+      } else {
+        blast(src)
+        setTimeout(function () {
+          find(src).then(file => {
+            if (file) {
+              div.src = file
+            }
+          })
+        }, 1000)
+      }
+    })
+    return '<div><img id="' + src + '" title="' + title + '" class="thumb" /></div>'
   }
 }
 
