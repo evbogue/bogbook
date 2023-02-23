@@ -99,6 +99,22 @@ function photoDiv () {
 
 const nameInput = h('input', {placeholder: 'Choose a name'})
 
+const textarea = h('textarea', {placeholder: 'Import a keypair'})
+
+const importer = h('div', [
+  textarea,
+  h('button', {onclick: function () {
+    if (textarea.value && (textarea.value.length === 132)) {
+      cachekv.put('keypair', textarea.value).then(function () {
+        location.hash = ''
+        location.reload()
+      })
+    } if (textarea.value.length != 132) {
+      alert('Invalid Keypair')
+    }
+  }}, ['Import'])
+])
+
 const intro = h('div', {classList: 'message'}, [
   h('h1', ['Get started']),
   h('p', ['On Bogbook you are identified using a name and an ed25519 public key. Type a name below to continue:']),
@@ -125,7 +141,12 @@ const intro = h('div', {classList: 'message'}, [
         })
       }},['Use this key']))
     } 
-  }}, ['Choose']), 
+  }}, ['Choose']),
+  h('button', {
+    onclick: function () {
+      intro.appendChild(importer)
+    }
+  }, ['Import existing keypair'])
 ])
 
 const about = h('div', {classList: 'message'}, [
