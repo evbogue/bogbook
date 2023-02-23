@@ -8,7 +8,7 @@ import { getName, getImage, getBoth } from './avatar.js'
 import { blast } from './replicate.js'
 import { cachekv } from './cachekv.js'
 
-function getContacts (textarea, preview) {
+function getContacts (textarea, preview, msg) {
   var span = h('span')
 
   var button = h('button', {classList: 'btn right', onclick: function () {
@@ -31,7 +31,10 @@ function getContacts (textarea, preview) {
               } else {
                 textarea.value = textarea.value + ' [' + name + '](' + feed + ')'
               }
-              preview.innerHTML = marked(textarea.value)
+              setTimeout(function () {
+                preview.innerHTML = marked(textarea.value)
+                cachekv.put('draft:' + msg.hash, textarea.value)
+              }, 50)
             })
           }}, [getImage(feed), ' ', getName(feed)]))
         })
@@ -46,7 +49,7 @@ function getContacts (textarea, preview) {
   return span
 }
 
-function photoAdder (textarea, preview) {
+function photoAdder (textarea, preview, msg) {
 
   const uploadButton = h('button', {classList: 'btn right', onclick: function () {
     input.click()
@@ -105,7 +108,10 @@ function photoAdder (textarea, preview) {
             } else {
               textarea.value = textarea.value + ' ![](' + hash + ')'
             }
-            preview.innerHTML = markdown(textarea.value)
+            setTimeout(function () {
+              preview.innerHTML = markdown(textarea.value)
+              cachekv.put('draft:' + msg.hash, textarea.value)
+            }, 50)
           })
         }
       }
@@ -153,12 +159,8 @@ export function composer (msg) {
 
   cachekv.get('draft:' + msg.hash).then(got => {
     if (got) {
-      console.log(got)
       textarea.value = got
       preview.innerHTML = markdown(textarea.value)
-      setTimeout(function () {
-        preview.innerHTML = markdown(textarea.value)
-      }, 1000)
     }
   })
 
@@ -170,7 +172,6 @@ export function composer (msg) {
           open(published).then(opened => {
             blast(opened.raw)
             blast(opened.data)
-            //blast(opened.data)
             render(opened).then(rendered => {
               const getMsg = document.getElementById(msg.hash)
               if (getMsg) {
@@ -194,8 +195,8 @@ export function composer (msg) {
     preview,
     textarea,
     publishButton,
-    photoAdder(textarea, preview),
-    getContacts(textarea, preview)
+    photoAdder(textarea, preview, msg),
+    getContacts(textarea, preview, msg)
   ])
 
   if (!(msg.hash === 'home' || msg.hash === msg.author)) {
