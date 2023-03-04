@@ -6,7 +6,7 @@ import { make, find } from './blob.js'
 import { encode } from './lib/base64.js'
 import { getBoth } from './avatar.js'
 import { h } from './lib/misc.js'
-import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
+import { addSocket, rmSocket, gossipMsg } from './gossip.js'
 
 let blastcache = []
 
@@ -216,9 +216,7 @@ export function connect (server) {
   }
   
   ws.onmessage = (msg) => {
-    if (!queue.includes(msg.data)) {
-      processReq(msg.data, ws)
-    }
+    processReq(msg.data, ws)
   }
 
   addEventListener('beforeunload', event => { 

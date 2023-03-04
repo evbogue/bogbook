@@ -1,7 +1,7 @@
 import { keys } from './keys.js'
 import { encode, decode } from './lib/base64.js'
 import { open } from './sbog.js'
-import { addSocket, rmSocket, gossipMsg, queue } from './gossip.js'
+import { addSocket, rmSocket, gossipMsg } from './gossip.js'
 import { logs } from './log.js'
 import { find, make } from './blob.js' 
 
@@ -112,9 +112,7 @@ export function connect (server) {
 
   ws.onmessage = (msg) => {
     //console.log(msg.data)
-    if (!queue.includes(msg.data)) {
-      processReq(msg.data, ws)
-    }
+    processReq(msg.data, ws)
   }
 
   setInterval(function () {
