@@ -73,12 +73,14 @@ export function query (scroller, src) {
 
   if (src.length === 44) {
     if (src === keys.pubkey()) {
-      header.appendChild(h('span', {classList: 'right'}, ['This is you.']))
+      header.appendChild(h('span', {classList: 'right'}, [
+        'This is you. ',
+        nameDiv,
+        photoAdder(src, messageDiv)
+      ]))
     }
     header.appendChild(h('span', [getBoth(src), ' ']))
     header.appendChild(composeDiv)
-    header.appendChild(nameDiv)
-    header.appendChild(photoAdder(src, messageDiv))
   } else if (src.startsWith('?')) {
     header.appendChild(h('span', ['Search: ' + src.substring(1)]))
   }
