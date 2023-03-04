@@ -152,7 +152,7 @@ const intro = h('div', {classList: 'message'}, [
 const about = h('div', {classList: 'message'}, [
   h('h1', [window.location.host]),
   h('img', {style: 'width: 100%', src:'./example.png'}),
-  h('p', {innerHTML:'This is an instance of Bogbook, a distributed social network of secure hashchains. When you publish messages they are signed using ed25519 public key cryptography and relayed via Deno servers.</p><p>This instance is hosted on <a href="https://deno.com/">Deno Deploy</a>.</p></p>Read the code at <a href="https://github.com/evbogue/bogbook/">Github</a> or <a href="https://git.sr.ht/~ev/bogbookv3/">SourceHut</a>.'}),
+  h('p', {innerHTML:'This is an instance of Bogbook, a distributed social network of secure hashchains. When you publish messages they are signed using ed25519 public key cryptography and relayed via Deno servers.</p><p>Read the code at <a href="https://github.com/evbogue/bogbook/">Github</a> or <a href="https://git.sr.ht/~ev/bogbookv3/">SourceHut</a>.'}),
   h('button', {classList: 'btn btn-large btn-primary', onclick: function () {
     about.parentNode.removeChild(about)
     welcome.appendChild(intro)
