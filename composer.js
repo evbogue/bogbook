@@ -136,7 +136,7 @@ export function composer (msg) {
 
   const context = h('div')
 
-  let contextText
+  let contextText = ''
 
   if (msg.hash.length === 44) {
     cachekv.get('name:' + msg.author).then(name => {
