@@ -134,6 +134,10 @@ export function composer (msg) {
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
+  const context = h('div')
+
+  let contextText
+
   if (msg.hash.length === 44) {
     cachekv.get('name:' + msg.author).then(name => {
       var select = window.getSelection().toString()
@@ -141,9 +145,11 @@ export function composer (msg) {
         name = msg.author.substring(0, 10) + '...'
       }
       if (msg.author === msg.hash) {
-        textarea.value = '[' + name + '](' + msg.author + ') '
+        contextText = '[' + name + '](' + msg.author + ') '
+        context.innerHTML = marked(contextText)
       } else {
-        textarea.value = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') '
+        contextText = '[' + name + '](' + msg.author + ') ↳ [' + (select || msg.hash.substring(0, 7)) + '](' + msg.hash + ') '
+        context.innerHTML = marked(contextText)
       }
     })
   }
@@ -168,7 +174,7 @@ export function composer (msg) {
     classList: 'btn btn-primary',
     onclick: function () {
       if (textarea.value) {
-        publish(textarea.value).then(published => {
+        publish(contextText + '\n\n' + textarea.value).then(published => {
           open(published).then(opened => {
             blast(opened.raw)
             blast(opened.data)
@@ -192,6 +198,7 @@ export function composer (msg) {
   }, ['Publish'])
 
   const compose = h('div', [
+    context,
     preview,
     textarea,
     publishButton,
