@@ -5,6 +5,9 @@ body {
 
 p {
   margin: 0;
+  overflow: auto;
+  word-break: break-all;
+  word-wrap: break-word;
   padding-top: .5ex;
   padding-bottom: .5ex;
 }
