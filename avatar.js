@@ -8,9 +8,9 @@ import { make, find } from './blob.js'
 import { blast } from './replicate.js'
 import { cachekv } from './cachekv.js'
 
-let imagecache = new Map()
+const imagecache = new Map()
 
-let namecache = new Map()
+const namecache = new Map()
 
 setInterval(function () {
   imagecache.clear() 
@@ -27,7 +27,7 @@ export function plainTextName (id) {
 }
 
 export function getImage (id) {
-  let img = vb(decode(id), 256)
+  const img = vb(decode(id), 256)
   img.classList = 'avatar'
 
   if (imagecache.has(id)) {

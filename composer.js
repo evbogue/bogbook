@@ -1,19 +1,19 @@
 import { h } from './lib/misc.js'
 import { markdown } from './markdown.js'
 import { publish, open } from './sbog.js'
-import { make, find } from './blob.js'
+import { make } from './blob.js'
 import { save, logs } from './log.js'
 import { render } from './render.js'
-import { getName, getImage, getBoth } from './avatar.js'
+import { getName, getImage } from './avatar.js'
 import { blast } from './replicate.js'
 import { cachekv } from './cachekv.js'
 
 function getContacts (textarea, preview, msg) {
-  var span = h('span')
+  const span = h('span')
 
-  var button = h('button', {classList: 'btn right', onclick: function () {
+  const button = h('button', {classList: 'btn right', onclick: function () {
     if (!span.childNodes[1]) {
-      var addrs = h('span')
+      const addrs = h('span')
       span.appendChild(addrs)
 
       logs.getFeeds().then(feeds => {
@@ -130,7 +130,7 @@ function photoAdder (textarea, preview, msg) {
 }
 
 export function composer (msg) {
-  let preview = h('div', [h('p', [' '])])
+  const preview = h('div', [h('p', [' '])])
   
   const textarea = h('textarea', {placeholder: 'Write a message...'})
 
@@ -140,7 +140,7 @@ export function composer (msg) {
 
   if (msg.hash.length === 44) {
     cachekv.get('name:' + msg.author).then(name => {
-      var select = window.getSelection().toString()
+      const select = window.getSelection().toString()
       if (!name) {
         name = msg.author.substring(0, 10) + '...'
       }
@@ -154,7 +154,7 @@ export function composer (msg) {
     })
   }
 
-  textarea.addEventListener('input', function (e) {
+  textarea.addEventListener('input', () => {
     if (textarea.value) {
       cachekv.put('draft:' + msg.hash, textarea.value)
     } else {

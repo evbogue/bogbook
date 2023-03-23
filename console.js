@@ -1,5 +1,4 @@
 import { keys } from './keys.js'
-import { encode, decode } from './lib/base64.js'
 import { open } from './sbog.js'
 import { addSocket, rmSocket, gossipMsg } from './gossip.js'
 import { logs } from './log.js'
@@ -7,9 +6,9 @@ import { find, make } from './blob.js'
 
 const server = 'ws://localhost:8080/ws' 
 
-let blastcache = []
+const blastcache = []
 
-function processReq (req, ws) {
+function processReq (req) {
   if (req.length === 44) {
     let gotit = false
     if (req === keys.pubkey()) {
@@ -97,8 +96,6 @@ function processReq (req, ws) {
   }
 }
 
-const sockets = new Set()
-
 export function connect (server) {
   console.log('Connecting to ' + server) 
 
@@ -124,7 +121,7 @@ export function connect (server) {
     Deno.exit()
   })
 
-  ws.onclose = (e) => {
+  ws.onclose = () => {
     rmSocket(ws)
     setTimeout(function () {
       connect(server)
@@ -133,7 +130,7 @@ export function connect (server) {
 
   let retryCount = 1
 
-  ws.onerror = (err) => {
+  ws.onerror = () => {
     setTimeout(function () {
       ws.close()
       rmSocket(ws)
