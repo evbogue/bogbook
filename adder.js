@@ -1,14 +1,13 @@
 import { render } from './render.js' 
 
-function addPosts (posts, div) {
-  posts.forEach(msg => {
-    render(msg).then(rendered => {
-      div.appendChild(rendered)
-    })
-  })
+const addPosts = async (posts, div) => {
+  for (const post of posts) {
+    const rendered = await render(post)
+    div.appendChild(rendered)
+  }
 }
 
-export function adder (log, src, div) {
+export const adder = (log, src, div) => {
   if (log && log[0]) {
     let index = 0
 
@@ -19,15 +18,11 @@ export function adder (log, src, div) {
     index = index + 25
 
     window.onscroll = () => {
-      if (
-        ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 1000)
-        && window.location.hash.substring(1) === src
-      ) {
+      if (((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 1000) && window.location.hash.substring(1) === src) {
         posts = reverse.slice(index, index + 25)
         index = index + 25
         addPosts(posts, div)
       }
     }
-    
   }
 }
