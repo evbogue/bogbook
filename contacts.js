@@ -5,6 +5,7 @@ import { getName, getImage } from './avatar.js'
 import { cachekv } from './cachekv.js'
 
 function contactButton (feed, textarea, preview, msg) {
+  const span = h('span')
   const contact = h('button', {classList: 'right', onclick: () => {
     cachekv.get('name:' + feed).then(got => {
       let name = feed.substring(0, 7) + '...'
@@ -22,14 +23,15 @@ function contactButton (feed, textarea, preview, msg) {
       cachekv.put('draft:' + msg.hash, textarea.value)
     })
   }}, [getImage(feed), ' ', getName(feed)])
-  return contact
+  span.appendChild(contact)
+  return span
 }
 
 export function getContacts (textarea, preview, msg) {
   const span = h('span')
   const contactsButton = h('button', {classList: 'right', onclick: () => {
     if (!span.childNodes[1]) {
-      const addrs = h('span')
+      const addrs = h('div')
       span.appendChild(addrs)
 
       logs.getFeeds().then(feeds => {
