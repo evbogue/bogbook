@@ -1,4 +1,4 @@
-import { serveDir } from 'https://deno.land/std@0.196.0/http/file_server.ts'
+import { serveDir } from 'https://deno.land/std@0.202.0/http/file_server.ts'
 import { addSocket, rmSocket, gossipMsg } from './gossip.js'
 
 const channel = new BroadcastChannel("")
