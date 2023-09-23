@@ -3,6 +3,14 @@ body {
   font-family: "Source Sans Pro", sans-serif;
 }
 
+div { margin: 0;}
+
+#screen {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; right: 0;
+}
+
 p {
   margin: 0;
   word-wrap: break-word;
