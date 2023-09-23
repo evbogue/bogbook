@@ -126,14 +126,16 @@ export async function render (msg) {
   messageDiv.appendChild(replyDiv)
 
   logs.query('?' + src).then(log => {
-    log.forEach(item => {
-      const getMsg = document.getElementById(item.hash)
-      if (!getMsg) {
-        render(item).then(rendered => {
-          replyDiv.appendChild(rendered)
-        })
-      }
-    })
+    if (log[0]) {
+      log.forEach(item => {
+        const getMsg = document.getElementById(item.hash)
+        if (!getMsg) {
+          render(item).then(rendered => {
+            replyDiv.appendChild(rendered)
+          })
+        }
+      })
+    }
   })
 
   logs.get(msg.previous).then(gotit => {
