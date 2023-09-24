@@ -1,6 +1,6 @@
 import { cachekv } from './cachekv.js'
 import nacl from './lib/nacl-fast-es.js'
-import { decode, encode } from './lib/base64.js'
+import { encode } from './lib/base64.js'
 
 export const keys = {}
 
