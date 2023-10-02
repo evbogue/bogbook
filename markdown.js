@@ -11,13 +11,13 @@ renderer.paragraph = function (paragraph) {
     let word = array[i]
     if (word.startsWith('#')) {
       let end
-      if ((word[word.length -1] === '.') || (word[word.length - 1] === ',') || (word[word.length -1] === ':') || (word[word.length -1] === '?')) {
+      if (['.', ',', '?', ':', '!'].some(char => word.endsWith(char))) {
         end = word[word.length - 1]
         word = word.substring(0, word.length - 1)
       }
       let counter = 0
 
-      var hashtag = "<a href='#?" + word + "'>" + word + "</a><sup>(" + counter + ")</sup>"
+      var hashtag = "<a href='#?" + word + "'>" + word + "</a>"
       if (end) {
         hashtag = hashtag + end
       }

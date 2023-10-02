@@ -4,26 +4,15 @@ import { decode, encode } from './lib/base64.js'
 import { logs } from './log.js'
 import { make, find } from './blob.js'
 
-export async function publish (data, key) {
-  let pubkey
-  let privkey  
-
-  if (key) {
-    pubkey = key.substring(0, 44)
-    privkey = key.substring(44)
-  }
-  if (!key) {
-    pubkey = keys.pubkey()
-    privkey = keys.privkey()
-  }
-
+export async function publish (data) {
+  const  pubkey = await keys.pubkey()
+  const  privkey = await keys.privkey()
   const datahash = await make(data)
 
   const timestamp = Date.now()
 
   const msg = timestamp + pubkey + datahash
 
-  //const hash = encode(sha256(new TextEncoder().encode(msg)))
   const hash = encode(
     Array.from(
       new Uint8Array(
@@ -59,7 +48,6 @@ export async function open (msg) {
     raw: msg
   }
 
-  //should be at render? obj.text = await find(obj.data)
   obj.text = await find(obj.data)
 
   return obj
